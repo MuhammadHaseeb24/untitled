@@ -1,0 +1,32 @@
+{
+  "units": [
+    {
+      "id": "ember_squire", "name": "Ember Squire", "role": "Basic melee fighter", "kind": "melee",
+      "cost": 50, "health": 100, "damage": 15, "attackRange": 38, "attackCooldown": 0.9, "windup": 0.3,
+      "moveSpeed": 78, "recruitTime": 1.2, "scale": 1.0, "bodyRadius": 14, "attackSfx": "sword"
+    },
+    {
+      "id": "iron_guard", "name": "Iron Guard", "role": "Defensive frontline", "kind": "melee",
+      "cost": 100, "health": 220, "damage": 22, "attackRange": 40, "attackCooldown": 1.2, "windup": 0.35,
+      "moveSpeed": 56, "recruitTime": 1.8, "armor": 0.25, "defendReduction": 0.15, "scale": 1.12,
+      "bodyRadius": 17, "attackSfx": "shield"
+    },
+    {
+      "id": "ash_archer", "name": "Ash Archer", "role": "Ranged damage", "kind": "ranged",
+      "cost": 80, "health": 70, "damage": 18, "attackRange": 300, "attackCooldown": 1.4, "windup": 0.45,
+      "moveSpeed": 70, "recruitTime": 1.5, "scale": 1.0, "bodyRadius": 13, "projectileSpeed": 560,
+      "kiteDistance": 110, "attackSfx": "bow"
+    },
+    {
+      "id": "flame_adept", "name": "Flame Adept", "role": "Magic area damage", "kind": "mage",
+      "cost": 150, "health": 85, "damage": 30, "attackRange": 260, "attackCooldown": 2.4, "windup": 0.6,
+      "moveSpeed": 62, "recruitTime": 2.2, "scale": 1.05, "bodyRadius": 14, "areaRadius": 70,
+      "projectileSpeed": 380, "kiteDistance": 140, "attackSfx": "magic"
+    },
+    {
+      "id": "ember_titan", "name": "Ember Titan", "role": "Slow, powerful giant", "kind": "melee",
+      "cost": 250, "health": 500, "damage": 55, "attackRange": 56, "attackCooldown": 3.0, "windup": 1.0,
+      "moveSpeed": 38, "recruitTime": 3.2, "scale": 1.7, "bodyRadius": 28, "attackSfx": "shield"
+    }
+  ]
+}

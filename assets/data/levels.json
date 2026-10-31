@@ -1,0 +1,562 @@
+{
+ "levels": [
+  {
+   "id": 1,
+   "name": "The First Flame",
+   "description": "Learn to recruit and attack.",
+   "difficulty": "easy",
+   "theme": 0,
+   "startingGold": 250,
+   "passiveIncome": 10,
+   "incomeIntervalSeconds": 5,
+   "playerFortressHealth": 1000,
+   "enemyFortressHealth": 700,
+   "populationLimit": 20,
+   "unlockedUnits": [
+    "ember_squire"
+   ],
+   "availableAbilities": [],
+   "rewardCoins": 100,
+   "parTimeSeconds": 150,
+   "starFortressThreshold": 0.6,
+   "enemy": {
+    "startingGold": 100,
+    "passiveIncome": 5,
+    "incomeIntervalSeconds": 5,
+    "populationLimit": 8,
+    "recruitIntervalSeconds": 14,
+    "buildOrder": [
+     "ember_squire"
+    ],
+    "attackThreshold": 3,
+    "retreatBelow": 1,
+    "firstAttackAfterSeconds": 45,
+    "healthMultiplier": 1.0,
+    "damageMultiplier": 1.0,
+    "waves": []
+   },
+   "tutorial": [
+    {
+     "id": "gold",
+     "text": "Gold lets you recruit troops, and you earn more over time. Watch the gold counter at the top.",
+     "highlight": "gold",
+     "advance": "tap"
+    },
+    {
+     "id": "recruit",
+     "text": "Tap the Ember Squire button to recruit your first fighter.",
+     "highlight": "recruit",
+     "advance": "recruit"
+    },
+    {
+     "id": "attack",
+     "text": "Troops hold near your fortress by default. Press ATTACK to send everyone at the enemy.",
+     "highlight": "attack",
+     "advance": "attack"
+    },
+    {
+     "id": "defend",
+     "text": "Press DEFEND to pull your army back to protect your fortress. You can switch any time.",
+     "highlight": "defend",
+     "advance": "defend"
+    },
+    {
+     "id": "finish",
+     "text": "Keep recruiting, then attack to destroy the enemy fortress. Good luck!",
+     "advance": "tap"
+    }
+   ]
+  },
+  {
+   "id": 2,
+   "name": "Broken Frontier",
+   "description": "Enemies push toward you. Use the defend command.",
+   "difficulty": "easy",
+   "theme": 1,
+   "startingGold": 250,
+   "passiveIncome": 10,
+   "incomeIntervalSeconds": 5,
+   "playerFortressHealth": 1000,
+   "enemyFortressHealth": 900,
+   "populationLimit": 20,
+   "unlockedUnits": [
+    "ember_squire",
+    "iron_guard"
+   ],
+   "availableAbilities": [],
+   "rewardCoins": 120,
+   "parTimeSeconds": 170,
+   "starFortressThreshold": 0.6,
+   "enemy": {
+    "startingGold": 120,
+    "passiveIncome": 6,
+    "incomeIntervalSeconds": 5,
+    "populationLimit": 10,
+    "recruitIntervalSeconds": 12,
+    "buildOrder": [
+     "ember_squire",
+     "ember_squire",
+     "iron_guard"
+    ],
+    "attackThreshold": 4,
+    "retreatBelow": 1,
+    "firstAttackAfterSeconds": 50,
+    "healthMultiplier": 1.0,
+    "damageMultiplier": 1.0,
+    "waves": []
+   },
+   "tutorial": [
+    {
+     "id": "defend2",
+     "text": "Enemy troops will march on your fortress. Stay on DEFEND to fight near your walls, then ATTACK when you have the upper hand.",
+     "highlight": "defend",
+     "advance": "tap"
+    }
+   ]
+  },
+  {
+   "id": 3,
+   "name": "Archer's Ridge",
+   "description": "Ranged units strike from a distance.",
+   "difficulty": "easy",
+   "theme": 2,
+   "startingGold": 250,
+   "passiveIncome": 10,
+   "incomeIntervalSeconds": 5,
+   "playerFortressHealth": 1100,
+   "enemyFortressHealth": 1000,
+   "populationLimit": 20,
+   "unlockedUnits": [
+    "ember_squire",
+    "iron_guard",
+    "ash_archer"
+   ],
+   "availableAbilities": [],
+   "rewardCoins": 140,
+   "parTimeSeconds": 190,
+   "starFortressThreshold": 0.6,
+   "enemy": {
+    "startingGold": 150,
+    "passiveIncome": 7,
+    "incomeIntervalSeconds": 5,
+    "populationLimit": 10,
+    "recruitIntervalSeconds": 11,
+    "buildOrder": [
+     "ember_squire",
+     "ash_archer",
+     "ember_squire"
+    ],
+    "attackThreshold": 4,
+    "retreatBelow": 1,
+    "firstAttackAfterSeconds": 50,
+    "healthMultiplier": 1.0,
+    "damageMultiplier": 1.0,
+    "waves": []
+   },
+   "tutorial": [
+    {
+     "id": "ranged",
+     "text": "Ash Archers shoot from far away. Keep them behind your front line and they will do the damage safely.",
+     "highlight": "recruit",
+     "advance": "tap"
+    }
+   ]
+  },
+  {
+   "id": 4,
+   "name": "The Iron Gate",
+   "description": "Enemy guards hold the line.",
+   "difficulty": "normal",
+   "theme": 3,
+   "startingGold": 250,
+   "passiveIncome": 10,
+   "incomeIntervalSeconds": 5,
+   "playerFortressHealth": 1100,
+   "enemyFortressHealth": 1200,
+   "populationLimit": 20,
+   "unlockedUnits": [
+    "ember_squire",
+    "iron_guard",
+    "ash_archer"
+   ],
+   "availableAbilities": [],
+   "rewardCoins": 160,
+   "parTimeSeconds": 210,
+   "starFortressThreshold": 0.6,
+   "enemy": {
+    "startingGold": 150,
+    "passiveIncome": 8,
+    "incomeIntervalSeconds": 5,
+    "populationLimit": 12,
+    "recruitIntervalSeconds": 10,
+    "buildOrder": [
+     "iron_guard",
+     "ember_squire",
+     "iron_guard",
+     "ash_archer"
+    ],
+    "attackThreshold": 5,
+    "retreatBelow": 1,
+    "firstAttackAfterSeconds": 60,
+    "healthMultiplier": 1.0,
+    "damageMultiplier": 1.0,
+    "waves": []
+   },
+   "tutorial": []
+  },
+  {
+   "id": 5,
+   "name": "Emberfall Pass",
+   "description": "Your first special ability.",
+   "difficulty": "normal",
+   "theme": 4,
+   "startingGold": 250,
+   "passiveIncome": 10,
+   "incomeIntervalSeconds": 5,
+   "playerFortressHealth": 1200,
+   "enemyFortressHealth": 1300,
+   "populationLimit": 20,
+   "unlockedUnits": [
+    "ember_squire",
+    "iron_guard",
+    "ash_archer"
+   ],
+   "availableAbilities": [
+    "ember_burst"
+   ],
+   "rewardCoins": 180,
+   "parTimeSeconds": 220,
+   "starFortressThreshold": 0.6,
+   "enemy": {
+    "startingGold": 150,
+    "passiveIncome": 8,
+    "incomeIntervalSeconds": 5,
+    "populationLimit": 12,
+    "recruitIntervalSeconds": 10,
+    "buildOrder": [
+     "ember_squire",
+     "ember_squire",
+     "ash_archer",
+     "iron_guard"
+    ],
+    "attackThreshold": 5,
+    "retreatBelow": 1,
+    "firstAttackAfterSeconds": 55,
+    "healthMultiplier": 1.0,
+    "damageMultiplier": 1.0,
+    "waves": []
+   },
+   "tutorial": [
+    {
+     "id": "ability",
+     "text": "Ember Burst blasts the biggest cluster of enemies. Tap it when enemies are grouped together.",
+     "highlight": "ability",
+     "advance": "ability"
+    }
+   ]
+  },
+  {
+   "id": 6,
+   "name": "Ruined Watchtower",
+   "description": "Mix melee and ranged troops.",
+   "difficulty": "normal",
+   "theme": 0,
+   "startingGold": 250,
+   "passiveIncome": 10,
+   "incomeIntervalSeconds": 5,
+   "playerFortressHealth": 1200,
+   "enemyFortressHealth": 1400,
+   "populationLimit": 20,
+   "unlockedUnits": [
+    "ember_squire",
+    "iron_guard",
+    "ash_archer",
+    "flame_adept"
+   ],
+   "availableAbilities": [
+    "ember_burst"
+   ],
+   "rewardCoins": 200,
+   "parTimeSeconds": 240,
+   "starFortressThreshold": 0.6,
+   "enemy": {
+    "startingGold": 180,
+    "passiveIncome": 9,
+    "incomeIntervalSeconds": 5,
+    "populationLimit": 14,
+    "recruitIntervalSeconds": 9,
+    "buildOrder": [
+     "ember_squire",
+     "ash_archer",
+     "iron_guard",
+     "ash_archer",
+     "ember_squire"
+    ],
+    "attackThreshold": 5,
+    "retreatBelow": 1,
+    "firstAttackAfterSeconds": 55,
+    "healthMultiplier": 1.0,
+    "damageMultiplier": 1.0,
+    "waves": []
+   },
+   "tutorial": []
+  },
+  {
+   "id": 7,
+   "name": "The Ashen Road",
+   "description": "Stronger enemy waves.",
+   "difficulty": "hard",
+   "theme": 1,
+   "startingGold": 250,
+   "passiveIncome": 10,
+   "incomeIntervalSeconds": 5,
+   "playerFortressHealth": 1300,
+   "enemyFortressHealth": 1500,
+   "populationLimit": 20,
+   "unlockedUnits": [
+    "ember_squire",
+    "iron_guard",
+    "ash_archer",
+    "flame_adept"
+   ],
+   "availableAbilities": [
+    "ember_burst",
+    "royal_rally"
+   ],
+   "rewardCoins": 220,
+   "parTimeSeconds": 260,
+   "starFortressThreshold": 0.6,
+   "enemy": {
+    "startingGold": 200,
+    "passiveIncome": 10,
+    "incomeIntervalSeconds": 5,
+    "populationLimit": 16,
+    "recruitIntervalSeconds": 8,
+    "buildOrder": [
+     "ember_squire",
+     "iron_guard",
+     "ash_archer",
+     "flame_adept"
+    ],
+    "attackThreshold": 5,
+    "retreatBelow": 2,
+    "firstAttackAfterSeconds": 50,
+    "healthMultiplier": 1.0,
+    "damageMultiplier": 1.0,
+    "waves": [
+     {
+      "at": 90,
+      "units": [
+       "ember_squire",
+       "ember_squire",
+       "ember_squire"
+      ]
+     },
+     {
+      "at": 150,
+      "units": [
+       "iron_guard",
+       "ash_archer",
+       "ash_archer"
+      ]
+     }
+    ]
+   },
+   "tutorial": []
+  },
+  {
+   "id": 8,
+   "name": "Siege of Cinder Keep",
+   "description": "A fortress with enormous health.",
+   "difficulty": "hard",
+   "theme": 3,
+   "startingGold": 250,
+   "passiveIncome": 10,
+   "incomeIntervalSeconds": 5,
+   "playerFortressHealth": 1300,
+   "enemyFortressHealth": 2600,
+   "populationLimit": 20,
+   "unlockedUnits": [
+    "ember_squire",
+    "iron_guard",
+    "ash_archer",
+    "flame_adept",
+    "ember_titan"
+   ],
+   "availableAbilities": [
+    "ember_burst",
+    "royal_rally",
+    "stone_ward"
+   ],
+   "rewardCoins": 250,
+   "parTimeSeconds": 330,
+   "starFortressThreshold": 0.6,
+   "enemy": {
+    "startingGold": 200,
+    "passiveIncome": 10,
+    "incomeIntervalSeconds": 5,
+    "populationLimit": 16,
+    "recruitIntervalSeconds": 8,
+    "buildOrder": [
+     "iron_guard",
+     "ash_archer",
+     "ember_squire",
+     "flame_adept"
+    ],
+    "attackThreshold": 6,
+    "retreatBelow": 2,
+    "firstAttackAfterSeconds": 60,
+    "healthMultiplier": 1.0,
+    "damageMultiplier": 1.0,
+    "waves": []
+   },
+   "tutorial": []
+  },
+  {
+   "id": 9,
+   "name": "The Crimson Host",
+   "description": "A mixed army tests everything you know.",
+   "difficulty": "hard",
+   "theme": 4,
+   "startingGold": 250,
+   "passiveIncome": 10,
+   "incomeIntervalSeconds": 5,
+   "playerFortressHealth": 1400,
+   "enemyFortressHealth": 1800,
+   "populationLimit": 20,
+   "unlockedUnits": [
+    "ember_squire",
+    "iron_guard",
+    "ash_archer",
+    "flame_adept",
+    "ember_titan"
+   ],
+   "availableAbilities": [
+    "ember_burst",
+    "royal_rally",
+    "stone_ward"
+   ],
+   "rewardCoins": 280,
+   "parTimeSeconds": 300,
+   "starFortressThreshold": 0.6,
+   "enemy": {
+    "startingGold": 250,
+    "passiveIncome": 12,
+    "incomeIntervalSeconds": 5,
+    "populationLimit": 18,
+    "recruitIntervalSeconds": 7,
+    "buildOrder": [
+     "ember_squire",
+     "ash_archer",
+     "flame_adept",
+     "iron_guard",
+     "ember_squire"
+    ],
+    "attackThreshold": 6,
+    "retreatBelow": 2,
+    "firstAttackAfterSeconds": 50,
+    "healthMultiplier": 1.0,
+    "damageMultiplier": 1.0,
+    "waves": [
+     {
+      "at": 60,
+      "units": [
+       "ember_squire",
+       "ember_squire",
+       "ember_squire"
+      ]
+     },
+     {
+      "at": 120,
+      "units": [
+       "iron_guard",
+       "iron_guard",
+       "ash_archer",
+       "flame_adept"
+      ]
+     },
+     {
+      "at": 200,
+      "units": [
+       "ember_titan"
+      ]
+     }
+    ]
+   },
+   "tutorial": []
+  },
+  {
+   "id": 10,
+   "name": "The Ember Crown",
+   "description": "Campaign finale against a boss-style force.",
+   "difficulty": "hard",
+   "theme": 2,
+   "startingGold": 250,
+   "passiveIncome": 10,
+   "incomeIntervalSeconds": 5,
+   "playerFortressHealth": 1500,
+   "enemyFortressHealth": 2200,
+   "populationLimit": 20,
+   "unlockedUnits": [
+    "ember_squire",
+    "iron_guard",
+    "ash_archer",
+    "flame_adept",
+    "ember_titan"
+   ],
+   "availableAbilities": [
+    "ember_burst",
+    "royal_rally",
+    "stone_ward"
+   ],
+   "rewardCoins": 400,
+   "parTimeSeconds": 360,
+   "starFortressThreshold": 0.6,
+   "enemy": {
+    "startingGold": 300,
+    "passiveIncome": 14,
+    "incomeIntervalSeconds": 5,
+    "populationLimit": 20,
+    "recruitIntervalSeconds": 6,
+    "buildOrder": [
+     "iron_guard",
+     "ash_archer",
+     "flame_adept",
+     "ember_squire",
+     "ember_titan"
+    ],
+    "attackThreshold": 6,
+    "retreatBelow": 2,
+    "firstAttackAfterSeconds": 50,
+    "healthMultiplier": 1.15,
+    "damageMultiplier": 1.0,
+    "waves": [
+     {
+      "at": 45,
+      "units": [
+       "iron_guard",
+       "iron_guard",
+       "ember_squire",
+       "ember_squire"
+      ]
+     },
+     {
+      "at": 120,
+      "units": [
+       "ember_titan"
+      ]
+     },
+     {
+      "at": 200,
+      "units": [
+       "ember_titan",
+       "flame_adept",
+       "flame_adept"
+      ]
+     }
+    ]
+   },
+   "tutorial": []
+  }
+ ]
+}

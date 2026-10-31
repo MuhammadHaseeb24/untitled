@@ -1,0 +1,16 @@
+{
+  "upgrades": [
+    {"id": "eco_income", "category": "Economy", "name": "Gold Veins", "description": "More passive gold every income tick.",
+     "effect": "passive_income", "perLevel": 1, "maxLevel": 5, "baseCost": 100, "costGrowth": 1.6},
+    {"id": "eco_start", "category": "Economy", "name": "War Chest", "description": "Start every battle with extra gold.",
+     "effect": "starting_gold", "perLevel": 25, "maxLevel": 4, "baseCost": 80, "costGrowth": 1.5},
+    {"id": "fort_health", "category": "Fortress", "name": "Reinforced Walls", "description": "Your fortress has more health.",
+     "effect": "fortress_health", "perLevel": 0.10, "maxLevel": 5, "baseCost": 120, "costGrowth": 1.6},
+    {"id": "army_damage", "category": "Army", "name": "Ember Steel", "description": "Your troops deal more damage.",
+     "effect": "army_damage", "perLevel": 0.05, "maxLevel": 5, "baseCost": 150, "costGrowth": 1.7},
+    {"id": "army_health", "category": "Army", "name": "Tempered Armor", "description": "Your troops have more health.",
+     "effect": "army_health", "perLevel": 0.05, "maxLevel": 5, "baseCost": 150, "costGrowth": 1.7},
+    {"id": "population", "category": "Population", "name": "Barracks", "description": "Raise the maximum number of troops you can field.",
+     "effect": "population", "perLevel": 1, "maxLevel": 5, "baseCost": 200, "costGrowth": 1.7}
+  ]
+}
