@@ -30,7 +30,7 @@ class CombatSystem {
   }) {
     var hits = 0;
     for (final u in game.unitsOf(victimTeam)) {
-      if (!u.isAlive) continue;
+      if (!u.targetable) continue;
       final dx = u.x - cx;
       final dy = (u.y - cy) * 2;
       if (sqrt(dx * dx + dy * dy) <= radius + u.model.bodyRadius) {
@@ -50,7 +50,7 @@ class CombatSystem {
   Damageable? findProjectileHit(double px, double py, Team projectileTeam) {
     final victim = projectileTeam.opponent;
     for (final UnitComponent u in game.unitsOf(victim)) {
-      if (!u.isAlive) continue;
+      if (!u.targetable) continue;
       if ((px - u.x).abs() <= u.model.bodyRadius + 6 &&
           (py - u.centerY).abs() <= 36 * u.model.scale) {
         return u;

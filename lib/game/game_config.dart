@@ -9,8 +9,8 @@ class GameConfig {
 
   static const double playerFortressX = 150;
   static const double enemyFortressX = 1450;
-  static const double fortressWidth = 190;
-  static const double fortressHeight = 280;
+  static const double fortressWidth = 110;
+  static const double fortressHeight = 240;
 
   /// Depth lanes (visual y offsets). Units only block allies in the same lane.
   static const List<double> laneOffsets = [-26, -13, 0, 13, 26];
@@ -30,4 +30,10 @@ class GameConfig {
   static const double fortressThreatRadius = 420;
   static const double endDelaySeconds = 1.6;
   static const int waveBonusPopulation = 6;
+
+  /// Seconds a miner digs before carrying a load back.
+  static const double digSeconds = 2.0;
+
+  /// Gold carried per trip before upgrades.
+  static const int baseCarry = 10;
 }

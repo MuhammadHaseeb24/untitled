@@ -161,7 +161,7 @@ class _LevelCard extends StatelessWidget {
                     ),
                     Text('1  Win the battle', style: _small),
                     Text(
-                      '2  Fortress above ${(level.starFortressThreshold * 100).round()}%',
+                      '2  Statue above ${(level.starFortressThreshold * 100).round()}%',
                       style: _small,
                     ),
                     Text(

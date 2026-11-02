@@ -22,12 +22,12 @@ class UnitVisual {
   /// 0..1 while spawning, 1 when fully spawned.
   double spawn = 1;
   bool buffed = false;
+  bool carrying = false;
   double time = 0;
 }
 
-/// Original procedural character art. Friendly units wear blue/gold with a
-/// round helmet and a gold badge; enemies wear crimson with horned helmets and
-/// a spiked badge, so teams differ by shape as well as colour.
+/// Original stick-figure art. Your army is black with a blue headband;
+/// the enemy is dark red with horns, so teams differ by shape as well as colour.
 class UnitPainter {
   UnitPainter._();
 
@@ -41,31 +41,29 @@ class UnitPainter {
   static Paint _stroke(Color c, double w) => _p
     ..style = PaintingStyle.stroke
     ..strokeCap = StrokeCap.round
+    ..strokeJoin = StrokeJoin.round
     ..color = c
     ..strokeWidth = w;
 
-  static const _skin = Color(0xFFF2C9A0);
-  static const _steel = Color(0xFFD9E2EC);
-  static const _wood = Color(0xFF7A5230);
+  static const _steel = Color(0xFFD5DCE6);
+  static const _wood = Color(0xFF8A5A2B);
 
   static void paint(Canvas c, UnitVisual v) {
     final friendly = v.team == Team.player;
-    final main = friendly ? const Color(0xFF2F6FE4) : const Color(0xFFC62F2F);
-    final dark = friendly ? const Color(0xFF1B3F8F) : const Color(0xFF7A1717);
-    final trim = friendly ? const Color(0xFFF2C14E) : const Color(0xFFEADFCB);
+    final body = friendly ? const Color(0xFF111111) : const Color(0xFF7E1414);
+    final accent = friendly ? const Color(0xFF4DB8FF) : const Color(0xFFFFC857);
 
     c.save();
     c.scale(v.facing * v.scale, v.scale);
 
-    // Ground shadow and buff ring (not affected by the death rotation).
     c.drawOval(
-      Rect.fromCenter(center: const Offset(0, 2), width: 38, height: 11),
+      Rect.fromCenter(center: const Offset(0, 2), width: 36, height: 9),
       _fill(const Color(0x55000000)),
     );
     if (v.buffed) {
       final a = (140 + 80 * sin(v.time * 6)).round().clamp(40, 255);
       c.drawOval(
-        Rect.fromCenter(center: const Offset(0, 2), width: 46, height: 14),
+        Rect.fromCenter(center: const Offset(0, 2), width: 46, height: 13),
         _stroke(Color.fromARGB(a, 255, 214, 90), 2.5),
       );
     }
@@ -99,25 +97,28 @@ class UnitPainter {
     final bob = v.moving
         ? sin(v.walk * 2).abs() * 2.0
         : sin(v.time * 2.5) * 0.8;
-    _legs(c, v, dark);
+    final thick = v.unitId == 'ember_titan' ? 7.0 : 4.6;
+    if (v.unitId != 'flame_adept') _legs(c, v, body, thick);
     c.save();
     c.translate(0, -bob);
-
     switch (v.unitId) {
+      case 'miner':
+        _miner(c, v, body, accent, thick);
+        break;
       case 'iron_guard':
-        _guard(c, v, main, dark, trim);
+        _guard(c, v, body, accent, thick);
         break;
       case 'ash_archer':
-        _archer(c, v, main, dark, trim);
+        _archer(c, v, body, accent, thick);
         break;
       case 'flame_adept':
-        _adept(c, v, main, dark, trim);
+        _adept(c, v, body, accent, thick);
         break;
       case 'ember_titan':
-        _titan(c, v, main, dark, trim);
+        _titan(c, v, body, accent, thick);
         break;
       default:
-        _squire(c, v, main, dark, trim);
+        _squire(c, v, body, accent, thick);
     }
     c.restore();
 
@@ -138,253 +139,261 @@ class UnitPainter {
     return strike + (rest - strike) * ((t - 0.6) / 0.4).clamp(0.0, 1.0);
   }
 
-  static void _legs(Canvas c, UnitVisual v, Color color) {
+  static void _legs(Canvas c, UnitVisual v, Color color, double w) {
     final s = v.moving ? sin(v.walk) : 0.0;
-    final p = _stroke(color, 5);
-    c.drawLine(Offset(-5, -26), Offset(-5 + s * 9, 0), p);
-    c.drawLine(Offset(5, -26), Offset(5 - s * 9, 0), p);
+    final p = _stroke(color, w);
+    c.drawLine(const Offset(0, -28), Offset(s * 11 - 2, 0), p);
+    c.drawLine(const Offset(0, -28), Offset(-s * 11 + 2, 0), p);
   }
 
-  static void _torso(
-    Canvas c,
-    Color main,
-    Color trim,
-    bool friendly, {
-    double half = 10,
-    double top = -54,
-  }) {
-    c.drawRRect(
-      RRect.fromRectAndRadius(
-        Rect.fromLTRB(-half, top, half, -26),
-        const Radius.circular(5),
-      ),
-      _fill(main),
+  static void _torso(Canvas c, Color color, double w) {
+    c.drawLine(
+      const Offset(0, -28),
+      const Offset(0, -52),
+      _stroke(color, w + 1.2),
     );
-    if (friendly) {
-      c.drawCircle(const Offset(0, -41), 3.6, _fill(trim));
-    } else {
-      final path = Path()
-        ..moveTo(-4.5, -46)
-        ..lineTo(4.5, -46)
-        ..lineTo(0, -35)
-        ..close();
-      c.drawPath(path, _fill(trim));
-    }
   }
 
   static void _head(
     Canvas c,
-    bool friendly,
-    Color helmet,
-    Color trim, {
-    double y = -64,
+    UnitVisual v,
+    Color color,
+    Color accent, {
+    double r = 8.5,
+    double y = -61,
   }) {
-    c.drawCircle(Offset(0, y), 9, _fill(_skin));
-    c.drawArc(
-      Rect.fromCircle(center: Offset(0, y - 1), radius: 10.5),
-      pi,
-      pi,
-      true,
-      _fill(helmet),
-    );
-    c.drawCircle(Offset(4, y), 1.4, _fill(const Color(0xFF222222)));
-    if (friendly) {
-      c.drawRect(Rect.fromLTRB(-1.5, y - 14, 1.5, y - 8), _fill(trim));
+    c.drawCircle(Offset(0, y), r, _fill(color));
+    if (v.team == Team.player) {
+      // blue headband with a small tail
+      c.drawLine(Offset(-r, y - 2), Offset(r, y - 2), _stroke(accent, 2.6));
+      c.drawLine(
+        Offset(-r, y - 2),
+        Offset(-r - 7, y + 3),
+        _stroke(accent, 2.4),
+      );
     } else {
-      final l = Path()
-        ..moveTo(-9, y - 6)
-        ..lineTo(-16, y - 18)
-        ..lineTo(-4, y - 9)
-        ..close();
-      final r = Path()
-        ..moveTo(9, y - 6)
-        ..lineTo(16, y - 18)
-        ..lineTo(4, y - 9)
-        ..close();
-      c.drawPath(l, _fill(trim));
-      c.drawPath(r, _fill(trim));
+      // horns
+      c.drawLine(
+        Offset(-r * 0.6, y - r * 0.8),
+        Offset(-r * 1.3, y - r * 2.0),
+        _stroke(accent, 2.8),
+      );
+      c.drawLine(
+        Offset(r * 0.6, y - r * 0.8),
+        Offset(r * 1.3, y - r * 2.0),
+        _stroke(accent, 2.8),
+      );
     }
   }
 
-  static void _backArm(Canvas c) {
+  static void _backArm(Canvas c, Color color, double w) {
     c.drawLine(
-      const Offset(-6, -50),
-      const Offset(-10, -37),
-      _stroke(_skin, 4),
+      const Offset(0, -50),
+      const Offset(-9, -36),
+      _stroke(color, w - 0.6),
     );
+  }
+
+  /// Draws an arm from the shoulder at [angle] (0 = hanging down, positive =
+  /// forward) and returns nothing; call [_weaponAlongArm] inside for gear.
+  static void _arm(
+    Canvas c,
+    Color color,
+    double w,
+    double angle,
+    double len,
+    void Function() weapon,
+  ) {
+    c.save();
+    c.translate(0, -50);
+    c.rotate(angle - pi / 2); // local +x now points along the arm
+    c.drawLine(Offset.zero, Offset(len, 0), _stroke(color, w - 0.6));
+    c.translate(len, 0);
+    weapon();
+    c.restore();
+  }
+
+  static void _miner(
+    Canvas c,
+    UnitVisual v,
+    Color body,
+    Color accent,
+    double w,
+  ) {
+    // gold sack on the back while carrying a load
+    if (v.carrying) {
+      c.drawCircle(const Offset(-9, -46), 10, _fill(const Color(0xFF8B5A2B)));
+      c.drawCircle(
+        const Offset(-9, -46),
+        10,
+        _stroke(const Color(0xFF3C2410), 2),
+      );
+      c.drawCircle(const Offset(-11, -48), 2.6, _fill(const Color(0xFFE9B72C)));
+      c.drawCircle(const Offset(-6, -44), 2.2, _fill(const Color(0xFFE9B72C)));
+    }
+    _backArm(c, body, w);
+    _torso(c, body, w);
+    _head(c, v, body, accent);
+    // miner's helmet lamp
+    c.drawCircle(const Offset(6, -66), 2.6, _fill(const Color(0xFFFFE08A)));
+    _arm(c, body, w, _swing(v, 0.5, -2.2, 1.35), 15, () {
+      c.drawLine(const Offset(-6, 0), const Offset(22, 0), _stroke(_wood, 2.6));
+      final head = Path()
+        ..moveTo(18, -12)
+        ..quadraticBezierTo(30, 0, 18, 12)
+        ..lineTo(21, 0)
+        ..close();
+      c.drawPath(head, _fill(_steel));
+    });
   }
 
   static void _squire(
     Canvas c,
     UnitVisual v,
-    Color main,
-    Color dark,
-    Color trim,
+    Color body,
+    Color accent,
+    double w,
   ) {
-    final f = v.team == Team.player;
-    _backArm(c);
-    _torso(c, main, trim, f);
-    _head(c, f, dark, trim);
-    c.save();
-    c.translate(6, -50);
-    c.rotate(_swing(v, 0.9, -1.9, 1.2));
-    c.drawLine(Offset.zero, const Offset(14, 0), _stroke(_skin, 4));
-    c.drawLine(
-      const Offset(14, -1),
-      const Offset(44, -1),
-      _stroke(_steel, 3.5),
-    );
-    c.drawLine(const Offset(14, -6), const Offset(14, 4), _stroke(trim, 3));
-    c.restore();
+    _backArm(c, body, w);
+    _torso(c, body, w);
+    _head(c, v, body, accent);
+    _arm(c, body, w, _swing(v, 0.7, -2.3, 1.45), 16, () {
+      c.drawLine(
+        const Offset(-2, 0),
+        const Offset(32, 0),
+        _stroke(_steel, 3.2),
+      );
+      c.drawLine(const Offset(3, -5), const Offset(3, 5), _stroke(accent, 2.6));
+    });
   }
 
   static void _guard(
     Canvas c,
     UnitVisual v,
-    Color main,
-    Color dark,
-    Color trim,
+    Color body,
+    Color accent,
+    double w,
   ) {
-    final f = v.team == Team.player;
-    _backArm(c);
-    _torso(c, dark, trim, f, half: 12, top: -56);
-    _head(c, f, main, trim);
-    // plume
-    c.drawLine(const Offset(0, -75), const Offset(-6, -84), _stroke(trim, 3));
-    // sword arm
-    c.save();
-    c.translate(8, -52);
-    c.rotate(_swing(v, 0.7, -1.7, 1.1));
-    c.drawLine(Offset.zero, const Offset(12, 0), _stroke(_skin, 4));
-    c.drawLine(
-      const Offset(12, -1),
-      const Offset(34, -1),
-      _stroke(_steel, 3.5),
-    );
-    c.restore();
-    // big shield
-    final shield = RRect.fromRectAndRadius(
-      const Rect.fromLTRB(9, -58, 24, -22),
-      const Radius.circular(6),
-    );
-    c.drawRRect(shield, _fill(main));
-    c.drawRRect(shield, _stroke(trim, 2));
-    c.drawCircle(const Offset(16.5, -40), 3.5, _fill(trim));
+    _backArm(c, body, w);
+    _torso(c, body, w + 1);
+    _head(c, v, body, accent);
+    // spear (thrusts forward)
+    _arm(c, body, w, _swing(v, 1.0, 0.55, 1.5), 15, () {
+      c.drawLine(
+        const Offset(-26, 0),
+        const Offset(34, 0),
+        _stroke(_wood, 2.8),
+      );
+      final tip = Path()
+        ..moveTo(34, -4)
+        ..lineTo(46, 0)
+        ..lineTo(34, 4)
+        ..close();
+      c.drawPath(tip, _fill(_steel));
+    });
+    // big round shield
+    c.drawCircle(const Offset(11, -40), 14, _fill(const Color(0xFF2B2B2B)));
+    c.drawCircle(const Offset(11, -40), 14, _stroke(accent, 2.4));
+    c.drawCircle(const Offset(11, -40), 4, _fill(accent));
   }
 
   static void _archer(
     Canvas c,
     UnitVisual v,
-    Color main,
-    Color dark,
-    Color trim,
+    Color body,
+    Color accent,
+    double w,
   ) {
-    final f = v.team == Team.player;
-    _backArm(c);
-    _torso(c, main, trim, f);
-    _head(c, f, dark, trim);
+    _backArm(c, body, w);
+    _torso(c, body, w);
+    _head(c, v, body, accent);
     final t = v.attackT;
     final pull = t < 0 ? 0.0 : (t < 0.55 ? t / 0.55 : 0.0);
-    final stringX = 12 - pull * 10;
+    final sx = 16 - pull * 11;
     final bow = Path()
-      ..moveTo(12, -72)
-      ..quadraticBezierTo(26, -51, 12, -30);
+      ..moveTo(16, -76)
+      ..quadraticBezierTo(32, -52, 16, -28);
     c.drawPath(bow, _stroke(_wood, 3));
     final str = Path()
-      ..moveTo(12, -72)
-      ..lineTo(stringX, -51)
-      ..lineTo(12, -30);
-    c.drawPath(str, _stroke(const Color(0xFFEEEEEE), 1.2));
+      ..moveTo(16, -76)
+      ..lineTo(sx, -52)
+      ..lineTo(16, -28);
+    c.drawPath(str, _stroke(const Color(0xFFEEEEEE), 1.1));
     if (t >= 0 && t < 0.56) {
-      c.drawLine(
-        Offset(stringX, -51),
-        Offset(stringX + 26, -51),
-        _stroke(_steel, 2),
-      );
-      c.drawLine(
-        Offset(stringX + 26, -54),
-        Offset(stringX + 30, -51),
-        _stroke(trim, 2),
-      );
+      c.drawLine(Offset(sx, -52), Offset(sx + 28, -52), _stroke(_steel, 2));
     }
-    c.drawLine(const Offset(6, -51), const Offset(14, -51), _stroke(_skin, 4));
+    c.drawLine(const Offset(0, -50), Offset(sx, -52), _stroke(body, w - 0.8));
+    c.drawLine(
+      const Offset(0, -50),
+      const Offset(18, -52),
+      _stroke(body, w - 0.8),
+    );
   }
 
   static void _adept(
     Canvas c,
     UnitVisual v,
-    Color main,
-    Color dark,
-    Color trim,
+    Color body,
+    Color accent,
+    double w,
   ) {
-    final f = v.team == Team.player;
-    _backArm(c);
     final robe = Path()
-      ..moveTo(-13, -22)
-      ..lineTo(13, -22)
-      ..lineTo(9, -54)
-      ..lineTo(-9, -54)
+      ..moveTo(-3, -54)
+      ..lineTo(-14, -2)
+      ..lineTo(14, -2)
+      ..lineTo(3, -54)
       ..close();
-    c.drawPath(robe, _fill(main));
-    c.drawRect(const Rect.fromLTRB(-9, -40, 9, -36), _fill(trim));
-    c.drawCircle(const Offset(0, -64), 9, _fill(_skin));
-    c.drawCircle(const Offset(4, -64), 1.4, _fill(const Color(0xFF222222)));
+    c.drawPath(robe, _fill(body));
+    c.drawLine(
+      const Offset(-12, -14),
+      const Offset(12, -14),
+      _stroke(accent, 2.2),
+    );
+    _head(c, v, body, accent);
     final hat = Path()
-      ..moveTo(-12, -69)
-      ..lineTo(12, -69)
-      ..lineTo(f ? 3 : 8, -98)
+      ..moveTo(-11, -66)
+      ..lineTo(11, -66)
+      ..lineTo(3, -92)
       ..close();
-    c.drawPath(hat, _fill(dark));
-    c.drawLine(const Offset(-13, -69), const Offset(13, -69), _stroke(trim, 3));
+    c.drawPath(hat, _fill(body));
+    c.drawLine(
+      const Offset(-12, -66),
+      const Offset(12, -66),
+      _stroke(accent, 2.6),
+    );
     final lift = v.attackT >= 0
         ? (v.attackT < 0.55 ? v.attackT / 0.55 : 0.0)
         : 0.0;
     c.drawLine(
-      Offset(12, -18 - lift * 6),
-      Offset(12, -84 - lift * 6),
+      Offset(14, -4 - lift * 6),
+      Offset(14, -80 - lift * 6),
       _stroke(_wood, 3),
     );
+    final orbC = Offset(14, -84 - lift * 6);
     final orbR = 5 + lift * 3 + sin(v.time * 5) * 0.6;
-    final orbC = Offset(12, -88 - lift * 6);
     c.drawCircle(orbC, orbR + 5, _fill(const Color(0x66FF8A2B)));
     c.drawCircle(orbC, orbR, _fill(const Color(0xFFFFB347)));
     c.drawLine(
-      const Offset(6, -50),
-      Offset(12, -58 - lift * 8),
-      _stroke(_skin, 4),
+      const Offset(0, -48),
+      Offset(14, -56 - lift * 8),
+      _stroke(body, w - 0.8),
     );
   }
 
   static void _titan(
     Canvas c,
     UnitVisual v,
-    Color main,
-    Color dark,
-    Color trim,
+    Color body,
+    Color accent,
+    double w,
   ) {
-    final f = v.team == Team.player;
-    _backArm(c);
-    _torso(c, dark, trim, f, half: 14, top: -58);
-    c.drawCircle(const Offset(-14, -54), 7, _fill(main));
-    c.drawCircle(const Offset(14, -54), 7, _fill(main));
-    final crack = _stroke(const Color(0xFFFF8A2B), 1.8);
-    c.drawLine(const Offset(-6, -52), const Offset(-2, -42), crack);
-    c.drawLine(const Offset(-2, -42), const Offset(-7, -32), crack);
-    c.drawLine(const Offset(7, -54), const Offset(4, -44), crack);
-    _head(c, f, main, trim, y: -67);
-    c.save();
-    c.translate(10, -54);
-    c.rotate(_swing(v, 0.8, -2.0, 1.25));
-    c.drawLine(Offset.zero, const Offset(12, 0), _stroke(_skin, 5));
-    c.drawLine(const Offset(12, 0), const Offset(46, 0), _stroke(_wood, 5));
-    c.drawRRect(
-      RRect.fromRectAndRadius(
-        const Rect.fromLTRB(40, -13, 58, 13),
-        const Radius.circular(3),
-      ),
-      _fill(const Color(0xFF6E7787)),
-    );
-    c.drawRect(const Rect.fromLTRB(40, -13, 58, -9), _fill(trim));
-    c.restore();
+    _backArm(c, body, w);
+    _torso(c, body, w);
+    _head(c, v, body, accent, r: 10.5, y: -64);
+    _arm(c, body, w, _swing(v, 0.8, -2.4, 1.5), 17, () {
+      c.drawLine(const Offset(0, 0), const Offset(36, 0), _stroke(_wood, 6));
+      c.drawCircle(const Offset(40, 0), 11, _fill(const Color(0xFF5B5F68)));
+      c.drawCircle(const Offset(40, 0), 11, _stroke(accent, 2));
+    });
   }
 }

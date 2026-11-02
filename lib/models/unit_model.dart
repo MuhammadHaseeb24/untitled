@@ -1,6 +1,6 @@
 import 'json_utils.dart';
 
-enum UnitKind { melee, ranged, mage }
+enum UnitKind { melee, ranged, mage, miner }
 
 UnitKind _parseKind(String s, String ctx) {
   switch (s) {
@@ -10,6 +10,8 @@ UnitKind _parseKind(String s, String ctx) {
       return UnitKind.ranged;
     case 'mage':
       return UnitKind.mage;
+    case 'miner':
+      return UnitKind.miner;
   }
   throw DataFormatException('$ctx: unknown kind "$s"');
 }
@@ -102,7 +104,7 @@ class UnitModel {
       ctx,
       'scale/bodyRadius must be > 0',
     );
-    if (kind != UnitKind.melee) {
+    if (kind == UnitKind.ranged || kind == UnitKind.mage) {
       check(
         model.projectileSpeed > 0,
         ctx,

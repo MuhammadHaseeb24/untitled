@@ -10,6 +10,7 @@ class BattleHud extends ChangeNotifier {
   int population = 0;
   int populationMax = 0;
   int queued = 0;
+  final Map<String, int> queuedByUnit = {};
   double queueProgress = 0;
 
   double playerHp = 1;

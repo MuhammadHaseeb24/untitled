@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../app/app_theme.dart';
 import 'game_button.dart';
+import 'glossy.dart';
 
 class PauseMenu extends StatelessWidget {
   const PauseMenu({
@@ -49,11 +50,7 @@ class PauseMenu extends StatelessWidget {
         child: Container(
           width: 340,
           padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: AppColors.panel,
-            borderRadius: BorderRadius.circular(18),
-            border: Border.all(color: AppColors.gold, width: 2),
-          ),
+          decoration: bevelPanel(),
           child: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,

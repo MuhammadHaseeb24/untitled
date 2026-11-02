@@ -5,6 +5,7 @@ import '../game/systems/level_system.dart';
 import '../models/battle_result.dart';
 import '../models/level_model.dart';
 import 'game_button.dart';
+import 'glossy.dart';
 import 'star_row.dart';
 
 class BattleResultDialog extends StatelessWidget {
@@ -68,11 +69,7 @@ class BattleResultDialog extends StatelessWidget {
             constraints: const BoxConstraints(maxWidth: 520),
             margin: const EdgeInsets.all(12),
             padding: const EdgeInsets.all(18),
-            decoration: BoxDecoration(
-              color: AppColors.panel,
-              borderRadius: BorderRadius.circular(18),
-              border: Border.all(color: color, width: 2),
-            ),
+            decoration: bevelPanel(border: color),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -95,7 +92,7 @@ class BattleResultDialog extends StatelessWidget {
                   const Padding(
                     padding: EdgeInsets.only(top: 4),
                     child: Text(
-                      'Both fortresses fell together. Retry to win.',
+                      'Both statues fell together. Retry to win.',
                       style: TextStyle(color: AppColors.textDim),
                     ),
                   ),
@@ -119,7 +116,7 @@ class BattleResultDialog extends StatelessWidget {
                     ),
                     _stat(
                       Icons.castle_rounded,
-                      '${(result.playerFortressFraction * 100).round()}% fortress',
+                      '${(result.playerFortressFraction * 100).round()}% statue',
                     ),
                   ],
                 ),
@@ -128,7 +125,7 @@ class BattleResultDialog extends StatelessWidget {
                   criterion(true, 'Win the battle'),
                   criterion(
                     hpOk,
-                    'Keep fortress above ${(level.starFortressThreshold * 100).round()}%',
+                    'Keep your statue above ${(level.starFortressThreshold * 100).round()}%',
                   ),
                   criterion(
                     timeOk,

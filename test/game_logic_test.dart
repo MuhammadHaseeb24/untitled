@@ -313,4 +313,65 @@ void main() {
       expect(ai.command, Command.defend);
     });
   });
+
+  group('Mining economy', () {
+    test('every level starts with no passive income and has gold mines', () {
+      for (final l in _levels()) {
+        expect(l.passiveIncome, 0, reason: 'level ${l.id}');
+        expect(l.startingGold, 0, reason: 'level ${l.id}');
+        expect(l.startingMiners > 0, isTrue);
+        expect(l.mines.isNotEmpty, isTrue);
+        expect(l.unlockedUnits.first, 'miner');
+      }
+    });
+
+    test('miner unit parses and is cheap enough to buy first', () {
+      final miner = _units()['miner']!;
+      expect(miner.kind, UnitKind.miner);
+      expect(miner.cost, 150);
+    });
+
+    test('Heavy Sacks raises carry capacity per trip', () {
+      final models = [
+        for (final u in (_json('upgrades.json')['upgrades'] as List))
+          UpgradeModel.fromJson(u as Map<String, dynamic>),
+      ];
+      final b = UpgradeBonuses.fromLevels(models, {'eco_income': 3});
+      expect(b.miningBonus, 6);
+    });
+
+    test('every level has an early enemy rush wave', () {
+      for (final l in _levels()) {
+        expect(l.enemy.waves.first.at <= 60, isTrue, reason: 'level ${l.id}');
+      }
+    });
+  });
+
+  group('Spear volley', () {
+    test('ability parses and every level can use it', () {
+      final abilities = {
+        for (final a in (_json('abilities.json')['abilities'] as List))
+          (a as Map<String, dynamic>)['id'] as String: AbilityModel.fromJson(a),
+      };
+      final volley = abilities['spear_volley']!;
+      expect(volley.type, AbilityType.spearVolley);
+      expect(volley.count > 0 && volley.spread > 0, isTrue);
+      for (final l in _levels()) {
+        expect(
+          l.availableAbilities.contains('spear_volley'),
+          isTrue,
+          reason: 'level ${l.id}',
+        );
+      }
+    });
+
+    test('cooldown gates repeated use', () {
+      final c = Cooldown(25);
+      c.start();
+      c.tick(24.9);
+      expect(c.ready, isFalse);
+      c.tick(0.2);
+      expect(c.ready, isTrue);
+    });
+  });
 }

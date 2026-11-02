@@ -5,6 +5,9 @@ abstract class Damageable {
   Team get team;
   bool get isAlive;
 
+  /// False while hidden inside the statue (garrison) or dead.
+  bool get targetable;
+
   /// Fraction of incoming damage that is ignored (0..1).
   double get damageReduction;
 

@@ -1,13 +1,43 @@
 {
-  "abilities": [
-    {"id": "ember_burst", "name": "Ember Burst", "type": "area_damage",
-     "description": "Blasts the biggest cluster of enemies with ember fire.",
-     "cooldown": 20, "radius": 130, "damage": 90},
-    {"id": "royal_rally", "name": "Royal Rally", "type": "army_buff",
-     "description": "Your army fights faster and harder for a short time.",
-     "cooldown": 30, "duration": 8, "damageMultiplier": 1.25, "attackSpeedMultiplier": 1.35},
-    {"id": "stone_ward", "name": "Stone Ward", "type": "fortress_shield",
-     "description": "Your fortress takes far less damage for a short time.",
-     "cooldown": 35, "duration": 6, "reduction": 0.75}
-  ]
+ "abilities": [
+  {
+   "id": "ember_burst",
+   "name": "Ember Burst",
+   "type": "area_damage",
+   "description": "Blasts the biggest cluster of enemies with ember fire.",
+   "cooldown": 20,
+   "radius": 130,
+   "damage": 90
+  },
+  {
+   "id": "royal_rally",
+   "name": "Royal Rally",
+   "type": "army_buff",
+   "description": "Your army fights faster and harder for a short time.",
+   "cooldown": 30,
+   "duration": 8,
+   "damageMultiplier": 1.25,
+   "attackSpeedMultiplier": 1.35
+  },
+  {
+   "id": "stone_ward",
+   "name": "Stone Ward",
+   "type": "fortress_shield",
+   "description": "Your statue takes far less damage for a short time.",
+   "cooldown": 35,
+   "duration": 6,
+   "reduction": 0.75
+  },
+  {
+   "id": "spear_volley",
+   "name": "Spear Volley",
+   "type": "spear_volley",
+   "description": "Hurl a rain of spears from your statue's rack onto the enemy army.",
+   "cooldown": 25,
+   "damage": 40,
+   "radius": 46,
+   "count": 14,
+   "spread": 240
+  }
+ ]
 }

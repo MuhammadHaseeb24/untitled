@@ -33,13 +33,14 @@ class GameButton extends StatelessWidget {
         : primary
         ? const [AppColors.ember, AppColors.emberDeep]
         : const [AppColors.panelLight, AppColors.panel];
+    final bottomColor = colors.last;
     return SizedBox(
       width: width,
       child: Material(
         color: Colors.transparent,
         child: Ink(
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(14),
+            borderRadius: BorderRadius.circular(16),
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
@@ -47,53 +48,101 @@ class GameButton extends StatelessWidget {
             ),
             border: Border.all(
               color: enabled
-                  ? (primary ? AppColors.gold : Colors.white24)
+                  ? (primary ? const Color(0xFFF7E7A8) : Colors.white38)
                   : Colors.white10,
-              width: primary ? 2 : 1,
+              width: primary ? 2.5 : 1.5,
             ),
+            boxShadow: enabled
+                ? [
+                    BoxShadow(
+                      color: Color.lerp(bottomColor, Colors.black, 0.55)!,
+                      offset: const Offset(0, 5),
+                    ),
+                    const BoxShadow(
+                      color: Color(0x88000000),
+                      blurRadius: 10,
+                      offset: Offset(0, 8),
+                    ),
+                  ]
+                : null,
           ),
           child: InkWell(
-            borderRadius: BorderRadius.circular(14),
+            borderRadius: BorderRadius.circular(16),
             onTap: enabled
                 ? () {
                     AppScope.read(context).audio.playSfx(Sfx.tap);
                     onPressed!();
                   }
                 : null,
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(minHeight: 52, minWidth: 52),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 18,
-                  vertical: 10,
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    if (icon != null) ...[
-                      Icon(
-                        icon,
-                        size: 22,
-                        color: enabled ? AppColors.text : Colors.white38,
-                      ),
-                      const SizedBox(width: 8),
-                    ],
-                    Flexible(
-                      child: Text(
-                        label,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          fontSize: 17,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 0.5,
-                          color: enabled ? AppColors.text : Colors.white38,
+            child: Stack(
+              children: [
+                if (enabled)
+                  Positioned(
+                    left: 6,
+                    right: 6,
+                    top: 3,
+                    height: 16,
+                    child: IgnorePointer(
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          gradient: const LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [Color(0x55FFFFFF), Color(0x00FFFFFF)],
+                          ),
                         ),
                       ),
                     ),
-                  ],
+                  ),
+                ConstrainedBox(
+                  constraints: const BoxConstraints(
+                    minHeight: 52,
+                    minWidth: 52,
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 18,
+                      vertical: 10,
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        if (icon != null) ...[
+                          Icon(
+                            icon,
+                            size: 22,
+                            color: enabled ? AppColors.text : Colors.white38,
+                          ),
+                          const SizedBox(width: 8),
+                        ],
+                        Flexible(
+                          child: Text(
+                            label,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 0.5,
+                              color: enabled ? AppColors.text : Colors.white38,
+                              shadows: enabled
+                                  ? const [
+                                      Shadow(
+                                        color: Colors.black54,
+                                        blurRadius: 2,
+                                        offset: Offset(0, 1),
+                                      ),
+                                    ]
+                                  : null,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
-              ),
+              ],
             ),
           ),
         ),

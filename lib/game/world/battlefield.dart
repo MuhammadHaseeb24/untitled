@@ -5,314 +5,405 @@ import 'package:flame/components.dart';
 
 import '../game_config.dart';
 
-class _Palette {
-  const _Palette(
-    this.skyTop,
-    this.skyBottom,
-    this.far,
-    this.near,
-    this.groundTop,
-    this.groundBottom,
-    this.glow,
-  );
-  final Color skyTop, skyBottom, far, near, groundTop, groundBottom, glow;
+class _Star {
+  _Star(this.x, this.y, this.r, this.phase);
+  final double x, y, r, phase;
 }
 
-const List<_Palette> _palettes = [
-  _Palette(
-    Color(0xFF2B1B3D),
-    Color(0xFFE0683A),
-    Color(0xFF4A2E4F),
-    Color(0xFF33243F),
-    Color(0xFF5A4630),
-    Color(0xFF2F2418),
-    Color(0xFFFFC27A),
-  ),
-  _Palette(
-    Color(0xFF28364F),
-    Color(0xFF9FB4C8),
-    Color(0xFF51647E),
-    Color(0xFF3C4C63),
-    Color(0xFF5B5F45),
-    Color(0xFF2D3022),
-    Color(0xFFFFF1C9),
-  ),
-  _Palette(
-    Color(0xFF1F3B3F),
-    Color(0xFF8CC4A0),
-    Color(0xFF3F6A5E),
-    Color(0xFF2B4F46),
-    Color(0xFF55633A),
-    Color(0xFF2A331C),
-    Color(0xFFFFF0B0),
-  ),
-  _Palette(
-    Color(0xFF23262F),
-    Color(0xFF8A94A6),
-    Color(0xFF454B5B),
-    Color(0xFF30343F),
-    Color(0xFF55555A),
-    Color(0xFF2A2A2E),
-    Color(0xFFE8ECF5),
-  ),
-  _Palette(
-    Color(0xFF200F18),
-    Color(0xFFC0392B),
-    Color(0xFF4A1E2A),
-    Color(0xFF331520),
-    Color(0xFF5A3329),
-    Color(0xFF2A1612),
-    Color(0xFFFF8A5A),
-  ),
-];
-
-class _Cloud {
-  _Cloud(this.x, this.y, this.s, this.speed);
-  double x;
-  final double y, s, speed;
-}
-
-class _Ember {
-  _Ember(this.x, this.y, this.vy, this.drift, this.size, this.phase);
-  double x, y;
-  final double vy, drift, size, phase;
-}
-
-Path _mountains(Random r, double baseY, double minH, double maxH, double step) {
-  final p = Path()..moveTo(-300, baseY);
-  var x = -300.0;
-  while (x < 1900) {
-    p.lineTo(x + step * 0.5, baseY - (minH + r.nextDouble() * (maxH - minH)));
-    x += step;
-    p.lineTo(x, baseY - minH * 0.35);
-  }
-  p
-    ..lineTo(x, baseY)
-    ..close();
-  return p;
-}
-
-/// Layered sky, mountains, ruins, forests and ground. Drawn in virtual
-/// coordinates and extended far beyond the world so letterboxing is seamless.
+/// Level backdrops, drawn in virtual coordinates and extended beyond the
+/// world so letterboxing is seamless. Theme (level.theme % 3):
+/// 0 = night field with a moon, 1 = snow mountains with an orange sun,
+/// 2 = brown desert with pyramids and flame braziers.
 class BattlefieldBackground extends Component {
   BattlefieldBackground({required int theme, required this.lowQuality})
-    : super(priority: 0) {
-    palette = _palettes[theme.abs() % _palettes.length];
-    final r = Random(theme * 7 + 3);
-    _far = _mountains(r, GameConfig.groundY - 30, 120, 300, 200);
-    _near = _mountains(r, GameConfig.groundY - 30, 60, 170, 150);
+    : mode = theme.abs() % 3,
+      super(priority: 0) {
+    final r = Random(theme * 13 + 7);
+    final starCount = lowQuality ? 35 : 90;
+    for (var i = 0; i < starCount; i++) {
+      _stars.add(
+        _Star(
+          r.nextDouble() * 1700 - 50,
+          r.nextDouble() * 300,
+          0.8 + r.nextDouble() * 1.5,
+          r.nextDouble() * 6.28,
+        ),
+      );
+    }
+    final List<Color> sky;
+    final List<Color> ground;
+    switch (mode) {
+      case 1:
+        sky = const [Color(0xFF081A52), Color(0xFF1C47A0), Color(0xFF3C74C8)];
+        ground = const [
+          Color(0xFF74AAB4),
+          Color(0xFF5B8E9A),
+          Color(0xFF3F6772),
+        ];
+        break;
+      case 2:
+        sky = const [Color(0xFFB8935A), Color(0xFFCFAA70), Color(0xFFDDBE86)];
+        ground = const [
+          Color(0xFFA27A4A),
+          Color(0xFF86633A),
+          Color(0xFF5E4426),
+        ];
+        break;
+      default:
+        sky = const [Color(0xFF040A26), Color(0xFF0C2A63), Color(0xFF2C6CA8)];
+        ground = const [
+          Color(0xFF237A2E),
+          Color(0xFF1B6A27),
+          Color(0xFF11481B),
+        ];
+    }
     skyPaint = Paint()
       ..shader = Gradient.linear(
         const Offset(0, 0),
-        Offset(0, GameConfig.groundY),
-        [palette.skyTop, palette.skyBottom],
+        const Offset(0, _horizon),
+        sky,
+        const [0.0, 0.65, 1.0],
       );
     groundPaint = Paint()
       ..shader = Gradient.linear(
-        Offset(0, GameConfig.groundY - 34),
+        const Offset(0, _horizon),
         const Offset(0, GameConfig.worldHeight),
-        [palette.groundTop, palette.groundBottom],
+        ground,
+        const [0.0, 0.5, 1.0],
       );
-    for (var i = 0; i < 7; i++) {
-      _clouds.add(
-        _Cloud(
-          r.nextDouble() * 1900 - 300,
-          70 + r.nextDouble() * 170,
-          0.7 + r.nextDouble() * 0.9,
-          4 + r.nextDouble() * 8,
-        ),
-      );
-    }
-    for (var i = 0; i < 90; i++) {
-      final x = r.nextDouble() * 1900 - 150;
-      final y = GameConfig.groundY - 20 + r.nextDouble() * 190;
-      _grain.add(Offset(x, y));
-      _grain.add(Offset(x + 6 + r.nextDouble() * 14, y + r.nextDouble() * 2));
-    }
-    for (var i = 0; i < 26; i++) {
-      _trees.add(
-        Offset(-100 + i * 72 + r.nextDouble() * 30, 20 + r.nextDouble() * 30),
-      );
-    }
-  }
-
-  final bool lowQuality;
-  late final _Palette palette;
-  late final Paint skyPaint;
-  late final Paint groundPaint;
-  late final Path _far;
-  late final Path _near;
-  final List<_Cloud> _clouds = [];
-  final List<Offset> _grain = [];
-  final List<Offset> _trees = [];
-  final Paint _p = Paint();
-
-  @override
-  void update(double dt) {
-    super.update(dt);
-    for (final c in _clouds) {
-      c.x += c.speed * dt;
-      if (c.x > 1900) c.x = -300;
-    }
-  }
-
-  @override
-  void render(Canvas canvas) {
-    final gy = GameConfig.groundY;
-    canvas.drawRect(Rect.fromLTRB(-2000, -1500, 3600, gy), skyPaint);
-
-    // sun / moon with glow
-    final sun = Offset(1180, 190);
-    for (var i = 4; i >= 1; i--) {
-      canvas.drawCircle(
-        sun,
-        34.0 + i * 22,
-        _p..color = palette.glow.withAlpha(14 + (4 - i) * 6),
-      );
-    }
-    canvas.drawCircle(sun, 34, _p..color = palette.glow);
-
-    for (final c in _clouds) {
-      final col = _white(40);
-      canvas.drawOval(
-        Rect.fromCenter(
-          center: Offset(c.x, c.y),
-          width: 150 * c.s,
-          height: 34 * c.s,
-        ),
-        _p..color = col,
-      );
-      canvas.drawOval(
-        Rect.fromCenter(
-          center: Offset(c.x + 40 * c.s, c.y - 12 * c.s),
-          width: 100 * c.s,
-          height: 30 * c.s,
-        ),
-        _p..color = col,
-      );
-    }
-
-    canvas.drawPath(_far, _p..color = palette.far);
-    // ruined towers
-    final ruin = _p..color = Color.lerp(palette.far, palette.near, 0.6)!;
-    for (final rx in [470.0, 820.0, 1130.0]) {
-      final tower = Path()
-        ..moveTo(rx - 22, gy - 28)
-        ..lineTo(rx - 22, gy - 150)
-        ..lineTo(rx - 10, gy - 140)
-        ..lineTo(rx - 2, gy - 168)
-        ..lineTo(rx + 8, gy - 146)
-        ..lineTo(rx + 22, gy - 158)
-        ..lineTo(rx + 22, gy - 28)
-        ..close();
-      canvas.drawPath(tower, ruin);
-    }
-    canvas.drawPath(_near, _p..color = palette.near);
-
-    // distant forest
-    final forest = _p
-      ..color = Color.lerp(palette.near, const Color(0xFF000000), 0.25)!;
-    for (final t in _trees) {
-      final bx = t.dx;
-      final by = gy - 30 + t.dy * 0.2;
-      final path = Path()
-        ..moveTo(bx - 13, by)
-        ..lineTo(bx, by - 38 - t.dy)
-        ..lineTo(bx + 13, by)
-        ..close();
-      canvas.drawPath(path, forest);
-    }
-
-    // ground
-    canvas.drawRect(Rect.fromLTRB(-2000, gy - 34, 3600, 2200), groundPaint);
-    canvas.drawRect(
-      Rect.fromLTRB(-2000, gy - 34, 3600, gy - 28),
-      _p..color = const Color(0x33FFFFFF),
-    );
-    final grain = _p
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2
-      ..color = const Color(0x22000000);
-    for (var i = 0; i + 1 < _grain.length; i += 2) {
-      canvas.drawLine(_grain[i], _grain[i + 1], grain);
-    }
-    _p.style = PaintingStyle.fill;
-  }
-
-  static Color _white(int a) => Color.fromARGB(a, 255, 255, 255);
-}
-
-/// Rocks, grass and drifting embers drawn in front of the units.
-class ForegroundLayer extends Component {
-  ForegroundLayer({required this.lowQuality, required int seed})
-    : super(priority: 900) {
-    final r = Random(seed + 11);
-    final count = lowQuality ? 10 : 28;
-    for (var i = 0; i < count; i++) {
-      _embers.add(
-        _Ember(
-          r.nextDouble() * 1600,
-          r.nextDouble() * 720,
-          14 + r.nextDouble() * 26,
-          (r.nextDouble() - 0.5) * 20,
-          1.5 + r.nextDouble() * 2.2,
-          r.nextDouble() * 6,
-        ),
+    _farHill = _hill(r, 335, 22, 260);
+    _midHill = _hill(r, 370, 16, 190);
+    _peaks = _mountains(r);
+    for (var i = 0; i < 160; i++) {
+      final x = r.nextDouble() * 1800 - 100;
+      final y = _horizon + 30 + r.nextDouble() * 350;
+      _marks.add(Offset(x, y));
+      _marks.add(
+        Offset(x + 7 + r.nextDouble() * 16, y + r.nextDouble() * 2 - 1),
       );
     }
     for (var i = 0; i < 9; i++) {
-      final x = -60 + i * 215 + r.nextDouble() * 80;
-      final w = 40 + r.nextDouble() * 60;
-      final h = 18 + r.nextDouble() * 26;
-      _rocks.add(
-        Path()
-          ..moveTo(x, 735)
-          ..lineTo(x + w * 0.15, 735 - h)
-          ..lineTo(x + w * 0.5, 735 - h * 1.25)
-          ..lineTo(x + w * 0.85, 735 - h * 0.8)
-          ..lineTo(x + w, 735)
-          ..close(),
+      _stains.add(
+        Rect.fromCenter(
+          center: Offset(
+            300 + r.nextDouble() * 1000,
+            GameConfig.groundY - 20 + r.nextDouble() * 90,
+          ),
+          width: 50 + r.nextDouble() * 70,
+          height: 8 + r.nextDouble() * 6,
+        ),
+      );
+    }
+    for (var i = 0; i < 40; i++) {
+      _pines.add(
+        Offset(
+          -40 + i * 44.0 + r.nextDouble() * 20,
+          0.6 + r.nextDouble() * 0.6,
+        ),
       );
     }
   }
 
+  static const double _horizon = 330;
+
+  final int mode;
   final bool lowQuality;
-  final List<_Ember> _embers = [];
-  final List<Path> _rocks = [];
+  late final Paint skyPaint;
+  late final Paint groundPaint;
+  late final Path _farHill;
+  late final Path _midHill;
+  late final List<List<double>> _peaks;
+  final List<_Star> _stars = [];
+  final List<Offset> _marks = [];
+  final List<Rect> _stains = [];
+  final List<Offset> _pines = [];
   final Paint _p = Paint();
   double _t = 0;
+
+  static List<List<double>> _mountains(Random r) {
+    final out = <List<double>>[];
+    var x = -150.0;
+    while (x < 1800) {
+      final w = 280 + r.nextDouble() * 220;
+      out.add([x, w, 130 + r.nextDouble() * 170]);
+      x += w * 0.62;
+    }
+    return out;
+  }
+
+  static Path _hill(Random r, double baseY, double amp, double wave) {
+    final p = Path()..moveTo(-300, 760);
+    p.lineTo(-300, baseY);
+    var x = -300.0;
+    var up = true;
+    while (x < 1900) {
+      final nx = x + wave * (0.6 + r.nextDouble() * 0.8);
+      final cy = baseY + (up ? -amp : amp) * (0.6 + r.nextDouble() * 0.8);
+      p.quadraticBezierTo(
+        (x + nx) / 2,
+        cy,
+        nx,
+        baseY + (r.nextDouble() - 0.5) * amp * 0.8,
+      );
+      x = nx;
+      up = !up;
+    }
+    p
+      ..lineTo(x, 760)
+      ..close();
+    return p;
+  }
 
   @override
   void update(double dt) {
     super.update(dt);
     _t += dt;
-    for (final e in _embers) {
-      e.y -= e.vy * dt;
-      e.x += e.drift * dt;
-      if (e.y < -20) {
-        e.y = 740;
-        e.x = (e.x * 7.3) % 1600;
-      }
-    }
   }
 
   @override
   void render(Canvas canvas) {
-    for (final rock in _rocks) {
-      canvas.drawPath(rock, _p..color = const Color(0xFF15121A));
+    canvas.drawRect(
+      const Rect.fromLTRB(-2000, -1500, 3600, _horizon + 40),
+      skyPaint,
+    );
+    switch (mode) {
+      case 1:
+        _renderSnow(canvas);
+        break;
+      case 2:
+        _renderDesert(canvas);
+        break;
+      default:
+        _renderNight(canvas);
     }
-    for (final e in _embers) {
-      final flick = 0.6 + 0.4 * sin(_t * 5 + e.phase);
+
+    canvas.drawRect(
+      Rect.fromLTRB(-2000, _horizon + 40, 3600, 2200),
+      groundPaint,
+    );
+    canvas.drawRect(
+      Rect.fromLTRB(-2000, _horizon + 40, 3600, _horizon + 46),
+      _p..color = mode == 2 ? const Color(0x33FFFFFF) : const Color(0x2200FF00),
+    );
+
+    final marks = _p
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2
+      ..color = mode == 0 ? const Color(0x3300230A) : const Color(0x22000000);
+    for (var i = 0; i + 1 < _marks.length; i += 2) {
+      canvas.drawLine(_marks[i], _marks[i + 1], marks);
+    }
+    _p.style = PaintingStyle.fill;
+
+    if (mode == 1) {
+      for (var i = 0; i < _stains.length; i++) {
+        canvas.drawOval(
+          _stains[i].translate(0, -30),
+          _p..color = const Color(0x55FFFFFF),
+        );
+      }
+    }
+    for (final s in _stains) {
+      canvas.drawOval(s, _p..color = const Color(0x66660808));
+    }
+  }
+
+  void _renderNight(Canvas canvas) {
+    for (final s in _stars) {
+      final tw = 0.55 + 0.45 * sin(_t * 1.6 + s.phase);
       canvas.drawCircle(
-        Offset(e.x, e.y),
-        e.size * 2.2,
-        _p..color = Color.fromARGB((50 * flick).round(), 255, 140, 40),
+        Offset(s.x, s.y),
+        s.r,
+        _p..color = Color.fromARGB((220 * tw).round(), 255, 255, 255),
+      );
+    }
+    const moon = Offset(300, 120);
+    for (var i = 4; i >= 1; i--) {
+      canvas.drawCircle(
+        moon,
+        62.0 + i * 20,
+        _p..color = Color.fromARGB(14 + (4 - i) * 5, 150, 220, 235),
+      );
+    }
+    canvas.drawCircle(moon, 62, _p..color = const Color(0xFF7FC4D6));
+    canvas.drawCircle(moon, 62, _p..color = const Color(0x33FFFFFF));
+    canvas.drawCircle(
+      const Offset(280, 100),
+      14,
+      _p..color = const Color(0x3300283A),
+    );
+    canvas.drawCircle(
+      const Offset(325, 138),
+      10,
+      _p..color = const Color(0x3300283A),
+    );
+    canvas.drawCircle(
+      const Offset(268, 146),
+      7,
+      _p..color = const Color(0x3300283A),
+    );
+    canvas.drawPath(_farHill, _p..color = const Color(0xFF0E4A1E));
+    canvas.drawPath(_midHill, _p..color = const Color(0xFF17642A));
+  }
+
+  void _renderSnow(Canvas canvas) {
+    // big orange sun with glow
+    const sun = Offset(1250, 210);
+    for (var i = 5; i >= 1; i--) {
+      canvas.drawCircle(
+        sun,
+        110.0 + i * 26,
+        _p..color = Color.fromARGB(16 + (5 - i) * 6, 255, 120, 30),
+      );
+    }
+    canvas.drawCircle(sun, 110, _p..color = const Color(0xFFFF8A18));
+    canvas.drawCircle(
+      const Offset(1235, 195),
+      70,
+      _p..color = const Color(0x55FF3B10),
+    );
+
+    // snowy mountains: icy body + white cap
+    for (final m in _peaks) {
+      final x = m[0], w = m[1], h = m[2];
+      final base = _horizon + 30;
+      final body = Path()
+        ..moveTo(x, base)
+        ..lineTo(x + w * 0.5, base - h)
+        ..lineTo(x + w, base)
+        ..close();
+      canvas.drawPath(body, _p..color = const Color(0xFF6CCBE8));
+      final cap = Path()
+        ..moveTo(x + w * 0.5, base - h)
+        ..lineTo(x + w * 0.32, base - h * 0.62)
+        ..lineTo(x + w * 0.42, base - h * 0.66)
+        ..lineTo(x + w * 0.5, base - h * 0.55)
+        ..lineTo(x + w * 0.6, base - h * 0.68)
+        ..lineTo(x + w * 0.68, base - h * 0.62)
+        ..close();
+      canvas.drawPath(cap, _p..color = const Color(0xFFF2FCFF));
+    }
+    canvas.drawPath(_midHill, _p..color = const Color(0xFF7DB4BE));
+    // pine trees
+    for (final t in _pines) {
+      final bx = t.dx;
+      final by = _horizon + 38 + (t.dy - 0.6) * 40;
+      final hgt = 26 + t.dy * 34;
+      canvas.drawRect(
+        Rect.fromLTWH(bx - 2, by - 6, 4, 8),
+        _p..color = const Color(0xFF4A3520),
+      );
+      for (var k = 0; k < 3; k++) {
+        final w = hgt * (0.42 - k * 0.07);
+        final y = by - 6 - k * hgt * 0.28;
+        final tri = Path()
+          ..moveTo(bx - w, y)
+          ..lineTo(bx, y - hgt * 0.5)
+          ..lineTo(bx + w, y)
+          ..close();
+        canvas.drawPath(tri, _p..color = const Color(0xFF2E7D4A));
+      }
+    }
+  }
+
+  void _renderDesert(Canvas canvas) {
+    // far dunes
+    canvas.drawPath(_farHill, _p..color = const Color(0xFFC49D61));
+    // golden pyramids / temples
+    for (final x in [380.0, 880.0, 1340.0]) {
+      final base = _horizon + 40;
+      final body = Path()
+        ..moveTo(x - 120, base)
+        ..lineTo(x, base - 150)
+        ..lineTo(x + 120, base)
+        ..close();
+      canvas.drawPath(body, _p..color = const Color(0xFFE2B85A));
+      final shade = Path()
+        ..moveTo(x, base - 150)
+        ..lineTo(x + 120, base)
+        ..lineTo(x + 10, base)
+        ..close();
+      canvas.drawPath(shade, _p..color = const Color(0xFFB98A33));
+      canvas.drawRect(
+        Rect.fromLTWH(x - 18, base - 44, 36, 44),
+        _p..color = const Color(0xFF3F2E18),
+      );
+    }
+    // brown stone wall behind the battle line
+    canvas.drawRect(
+      const Rect.fromLTRB(-2000, _horizon - 20, 3600, _horizon + 44),
+      _p..color = const Color(0xFF8A6A3E),
+    );
+    for (var x = -100.0; x < 1750; x += 64) {
+      canvas.drawLine(
+        Offset(x, _horizon - 20),
+        Offset(x, _horizon + 44),
+        _p
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 2
+          ..color = const Color(0x33000000),
+      );
+    }
+    _p.style = PaintingStyle.fill;
+    // flame braziers
+    for (final x in [150.0, 640.0, 1120.0, 1500.0]) {
+      final y = _horizon + 38;
+      canvas.drawRect(
+        Rect.fromLTWH(x - 14, y - 26, 28, 26),
+        _p..color = const Color(0xFF2E2216),
+      );
+      canvas.drawRect(
+        Rect.fromLTWH(x - 20, y - 32, 40, 8),
+        _p..color = const Color(0xFF4A3622),
+      );
+      final f = 1 + 0.12 * sin(_t * 9 + x);
+      canvas.drawCircle(
+        Offset(x, y - 48),
+        18 * f,
+        _p..color = const Color(0xAAFF7A1A),
       );
       canvas.drawCircle(
-        Offset(e.x, e.y),
-        e.size,
-        _p..color = Color.fromARGB((230 * flick).round(), 255, 190, 90),
+        Offset(x, y - 46),
+        11 * f,
+        _p..color = const Color(0xFFFFB02E),
       );
+      canvas.drawCircle(
+        Offset(x, y - 44),
+        5 * f,
+        _p..color = const Color(0xFFFFF0A0),
+      );
+    }
+  }
+}
+
+/// A few dark grass tufts drawn in front of the units at the bottom edge
+/// (night theme only).
+class ForegroundLayer extends Component {
+  ForegroundLayer({required this.lowQuality, required int seed, this.theme = 0})
+    : super(priority: 900) {
+    final r = Random(seed + 21);
+    final n = lowQuality ? 24 : 60;
+    for (var i = 0; i < n; i++) {
+      _tufts.add(Offset(r.nextDouble() * 1700 - 50, 700 + r.nextDouble() * 30));
+    }
+  }
+
+  final bool lowQuality;
+  final int theme;
+  final List<Offset> _tufts = [];
+  final Paint _p = Paint()
+    ..style = PaintingStyle.stroke
+    ..strokeWidth = 2.6
+    ..strokeCap = StrokeCap.round
+    ..color = const Color(0xFF0B3A14);
+
+  @override
+  void render(Canvas canvas) {
+    if (theme.abs() % 3 != 0) return;
+    for (final t in _tufts) {
+      canvas.drawLine(t, t.translate(-5, -16), _p);
+      canvas.drawLine(t, t.translate(1, -20), _p);
+      canvas.drawLine(t, t.translate(7, -14), _p);
     }
   }
 }

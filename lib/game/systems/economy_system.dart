@@ -74,6 +74,15 @@ class RecruitQueue {
 
   void enqueue(UnitModel unit) => _items.add(QueuedRecruit(unit));
 
+  /// How many of each unit id are waiting in the queue.
+  Map<String, int> countsByUnit() {
+    final out = <String, int>{};
+    for (final i in _items) {
+      out[i.unit.id] = (out[i.unit.id] ?? 0) + 1;
+    }
+    return out;
+  }
+
   /// Advances training and returns units that finished during this step.
   List<UnitModel> tick(double dt) {
     final ready = <UnitModel>[];

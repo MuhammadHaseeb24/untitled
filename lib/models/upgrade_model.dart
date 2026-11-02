@@ -4,7 +4,7 @@ import 'json_utils.dart';
 
 enum UpgradeEffect {
   startingGold,
-  passiveIncome,
+  miningYield,
   fortressHealth,
   armyDamage,
   armyHealth,
@@ -15,8 +15,8 @@ UpgradeEffect _parseEffect(String s, String ctx) {
   switch (s) {
     case 'starting_gold':
       return UpgradeEffect.startingGold;
-    case 'passive_income':
-      return UpgradeEffect.passiveIncome;
+    case 'mining_yield':
+      return UpgradeEffect.miningYield;
     case 'fortress_health':
       return UpgradeEffect.fortressHealth;
     case 'army_damage':
@@ -68,8 +68,8 @@ class UpgradeModel {
     switch (effect) {
       case UpgradeEffect.startingGold:
         return '+${total.round()} starting gold';
-      case UpgradeEffect.passiveIncome:
-        return '+${total.round()} gold per tick';
+      case UpgradeEffect.miningYield:
+        return '+${total.round()} gold per trip';
       case UpgradeEffect.population:
         return '+${total.round()} troops';
       default:
@@ -102,7 +102,7 @@ class UpgradeModel {
 class UpgradeBonuses {
   const UpgradeBonuses({
     this.startingGold = 0,
-    this.incomeBonus = 0,
+    this.miningBonus = 0,
     this.fortressHealthMultiplier = 1,
     this.damageMultiplier = 1,
     this.healthMultiplier = 1,
@@ -112,7 +112,7 @@ class UpgradeBonuses {
   static const none = UpgradeBonuses();
 
   final int startingGold;
-  final int incomeBonus;
+  final int miningBonus;
   final double fortressHealthMultiplier;
   final double damageMultiplier;
   final double healthMultiplier;
@@ -129,7 +129,7 @@ class UpgradeBonuses {
       switch (m.effect) {
         case UpgradeEffect.startingGold:
           gold += total;
-        case UpgradeEffect.passiveIncome:
+        case UpgradeEffect.miningYield:
           income += total;
         case UpgradeEffect.fortressHealth:
           fort += total;
@@ -143,7 +143,7 @@ class UpgradeBonuses {
     }
     return UpgradeBonuses(
       startingGold: gold.round(),
-      incomeBonus: income.round(),
+      miningBonus: income.round(),
       fortressHealthMultiplier: 1 + fort,
       damageMultiplier: 1 + dmg,
       healthMultiplier: 1 + hp,

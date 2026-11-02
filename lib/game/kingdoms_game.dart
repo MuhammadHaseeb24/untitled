@@ -15,7 +15,9 @@ import 'battle_hud.dart';
 import 'components/damageable.dart';
 import 'components/effect_component.dart';
 import 'components/fortress_component.dart';
+import 'components/mine_component.dart';
 import 'components/projectile_component.dart';
+import 'components/spear_component.dart';
 import 'components/unit_component.dart';
 import 'game_config.dart';
 import 'game_types.dart';
@@ -62,7 +64,7 @@ class KingdomsGame extends FlameGame {
   late final CombatSystem combat = CombatSystem(this);
   late final EconomySystem economy = EconomySystem(
     startingGold: level.startingGold + bonuses.startingGold,
-    passiveIncome: level.passiveIncome + bonuses.incomeBonus,
+    passiveIncome: level.passiveIncome,
     intervalSeconds: level.incomeIntervalSeconds,
   );
   late final EconomySystem enemyEconomy = EconomySystem(
@@ -88,6 +90,7 @@ class KingdomsGame extends FlameGame {
     maxHealth: level.enemyFortressHealth * level.enemy.healthMultiplier,
   );
 
+  final List<MineComponent> mines = [];
   final List<UnitComponent> playerUnits = [];
   final List<UnitComponent> enemyUnits = [];
   final Map<String, Cooldown> cooldowns = {};
@@ -169,7 +172,24 @@ class KingdomsGame extends FlameGame {
     add(BattlefieldBackground(theme: level.theme, lowQuality: lowQuality));
     add(playerFortress);
     add(enemyFortress);
-    add(ForegroundLayer(lowQuality: lowQuality, seed: level.id));
+    for (final spec in level.mines) {
+      final mine = MineComponent(x: spec.x, totalGold: spec.gold);
+      mines.add(mine);
+      add(mine);
+    }
+    add(
+      ForegroundLayer(
+        lowQuality: lowQuality,
+        seed: level.id,
+        theme: level.theme,
+      ),
+    );
+    final miner = data.units['miner'];
+    if (miner != null) {
+      for (var i = 0; i < level.startingMiners; i++) {
+        _spawnUnit(Team.player, miner, silent: true);
+      }
+    }
     _initTutorial();
     _syncHud();
   }
@@ -280,7 +300,49 @@ class KingdomsGame extends FlameGame {
 
   // --- Units ----------------------------------------------------------------
 
-  void _spawnUnit(Team team, UnitModel model) {
+  // --- Mining ---------------------------------------------------------------
+
+  /// Gold a miner carries per trip (base 10, raised by the Heavy Sacks upgrade).
+  int get carryCapacity => GameConfig.baseCarry + bonuses.miningBonus;
+
+  /// Nearest mine on the miner's side of the field that still has gold and
+  /// room, or any non-empty mine if all are busy. Null when everything is empty.
+  MineComponent? pickMine(double fromX, Team team) {
+    if (team != Team.player) return null;
+    MineComponent? best;
+    var bestD = double.infinity;
+    MineComponent? busy;
+    var busyD = double.infinity;
+    for (final m in mines) {
+      if (m.depleted) continue;
+      final d = (m.x - fromX).abs();
+      if (m.hasRoom) {
+        if (d < bestD) {
+          best = m;
+          bestD = d;
+        }
+      } else if (d < busyD) {
+        busy = m;
+        busyD = d;
+      }
+    }
+    return best ?? busy;
+  }
+
+  void depositGold(UnitComponent miner, int amount) {
+    if (amount <= 0 || !combatActive) return;
+    economy.add(amount);
+    addEffect(
+      EffectComponent.floatText(
+        at: Vector2(miner.x, miner.y - 70),
+        text: '+$amount',
+        color: const Color(0xFFFFD84D),
+      ),
+    );
+    audio.playSfx(Sfx.tap);
+  }
+
+  void _spawnUnit(Team team, UnitModel model, {bool silent = false}) {
     final count = team == Team.player
         ? _spawnCountPlayer++
         : _spawnCountEnemy++;
@@ -305,7 +367,7 @@ class KingdomsGame extends FlameGame {
     );
     unitsOf(team).add(unit);
     add(unit);
-    if (team == Team.player) audio.playSfx(Sfx.recruit);
+    if (team == Team.player && !silent) audio.playSfx(Sfx.recruit);
   }
 
   void onUnitDied(UnitComponent unit) {
@@ -444,7 +506,7 @@ class KingdomsGame extends FlameGame {
     final changed = playerCommand != command;
     playerCommand = command;
     if (changed) audio.playSfx(Sfx.tap);
-    _tutorialEvent(command == Command.attack ? 'attack' : 'defend');
+    _tutorialEvent(command.name);
     _syncHud();
   }
 
@@ -493,6 +555,35 @@ class KingdomsGame extends FlameGame {
         _rallyModel = model;
         _rallyRemaining = model.duration;
         break;
+      case AbilityType.spearVolley:
+        final center = _bestEnemyCluster(model.spread * 0.5);
+        if (center == null) {
+          showToast('No enemies to hit');
+          audio.playSfx(Sfx.error);
+          return AbilityResult.noTarget;
+        }
+        final minX = playerFortress.frontX + 40;
+        final maxX = enemyFortress.frontX - 30;
+        for (var i = 0; i < model.count; i++) {
+          final tx = (center + (rng.nextDouble() * 2 - 1) * model.spread / 2)
+              .clamp(minX, maxX)
+              .toDouble();
+          final lane = GameConfig
+              .laneOffsets[rng.nextInt(GameConfig.laneOffsets.length)];
+          add(
+            SpearComponent(
+              game: this,
+              startX: playerFortress.x - 60,
+              targetX: tx,
+              landLane: lane,
+              damage: model.damage * bonuses.damageMultiplier,
+              radius: model.radius,
+              delay: i * 0.07,
+              playSound: i == 0,
+            ),
+          );
+        }
+        break;
       case AbilityType.fortressShield:
         playerFortress.shieldTime = model.duration;
         playerFortress.shieldReduction = model.reduction;
@@ -511,10 +602,10 @@ class KingdomsGame extends FlameGame {
     var bestCount = 0;
     var bestDist = double.infinity;
     for (final c in enemyUnits) {
-      if (!c.isAlive) continue;
+      if (!c.targetable) continue;
       var count = 0;
       for (final o in enemyUnits) {
-        if (o.isAlive && (o.x - c.x).abs() <= radius * 0.8) count++;
+        if (o.targetable && (o.x - c.x).abs() <= radius * 0.8) count++;
       }
       final dist = (c.x - playerFortress.frontX).abs();
       if (count > bestCount || (count == bestCount && dist < bestDist)) {
@@ -645,6 +736,9 @@ class KingdomsGame extends FlameGame {
     hud.population = reservedPopulation;
     hud.populationMax = populationLimit;
     hud.queued = playerQueue.length;
+    hud.queuedByUnit
+      ..clear()
+      ..addAll(playerQueue.countsByUnit());
     hud.queueProgress = playerQueue.headProgress;
     hud.playerHp = playerFortress.health;
     hud.playerMaxHp = playerFortress.maxHealth;

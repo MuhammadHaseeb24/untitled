@@ -34,12 +34,15 @@ If `flutter pub get` complains about a package version, run `flutter pub upgrade
 
 ## 2. How to play
 
-* Recruit troops with gold (passive income + level reward). Troops fight automatically.
-* **DEFEND** (default): the army holds near your fortress and fights what comes close. **ATTACK**: everyone advances on the enemy. The selected command is highlighted.
-* Abilities (unlock from level 5): **Ember Burst** hits the biggest enemy cluster, **Royal Rally** buffs your army, **Stone Ward** shields your fortress.
-* Win by destroying the enemy fortress while yours survives. Both falling in the same step is a **draw** (retry).
-* Stars: 1 = win, 2 = fortress above the level threshold (60% by default), 3 = win within the par time. Shown on the level card and result screen.
+**Concept:** every level starts with **no coins**. You only have 2-3 miners and a few gold-ore piles near your statue. Miners dig gold, carry it back to the statue, and that gold pays for your army. The enemy **rushes you early** (about a minute in), so you must turn mined gold into protection: swordsmen, spearmen, archers, fire mages (Flame Adept) and giants.
+
+* **Miner (150):** digs 10 gold per trip (more with the *Heavy Sacks* upgrade). Piles run out, so mine smart. Miners are fragile and enemies hunt them.
+* **GARRISON:** hides your whole army, miners included, inside the statue (safe from the rush). **DEFEND** (default): troops hold near your statue and fight what comes close. **ATTACK**: everyone advances. The selected command is highlighted.
+* Abilities (from level 5): **Ember Burst** hits the biggest enemy cluster, **Royal Rally** buffs your army, **Stone Ward** shields your statue.
+* Win by destroying the enemy statue while yours survives. Both falling in the same step is a **draw** (retry).
+* Stars: 1 = win, 2 = statue above the level threshold (60% by default), 3 = win within the par time.
 * Ember Coins (persistent) come from first-time level rewards and new stars only, so replays never duplicate rewards. Spend them in **Army Upgrades**. Battle gold resets every battle.
+* Maps rotate: night statue field, snow mountains with an orange sun, brown desert with braziers.
 
 ## 3. Architecture
 
@@ -57,7 +60,7 @@ The world is a virtual 1600x720 space scaled to any aspect ratio (letterboxing i
 
 ## 4. Tests
 
-`flutter test` runs `test/game_logic_test.dart` (economy, queue, cooldown, stars/rewards, save round-trip and corrupt data, data-file validation, enemy AI). There are **no** widget or integration tests yet.
+`flutter test` runs `test/game_logic_test.dart` (economy, queue, cooldown, stars/rewards, save round-trip and corrupt data, data-file validation, enemy AI, mining setup). There are **no** widget or integration tests yet.
 
 ## 5. First run checklist
 
@@ -73,7 +76,8 @@ The world is a virtual 1600x720 space scaled to any aspect ratio (letterboxing i
 * Audio is simple generated placeholder sound (`tools/generate_audio.py`); art is procedural. Replace with produced assets for a store release.
 * Not implemented: language selection, privacy-policy link, daily reward, battle resume after app kill (the pause menu appears when you return), individual unit selection, widget/integration tests.
 * Ember Burst auto-targets the largest enemy cluster (no manual aiming).
-* Fortresses do not shoot back.
+* The statues do not shoot back.
+* In-battle upgrade bar, extra unit types and the other characters from your reference screenshots are not added yet.
 
 ## 7. Release build
 

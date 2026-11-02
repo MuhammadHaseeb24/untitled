@@ -93,6 +93,12 @@ class EnemyConfig {
   }
 }
 
+class MineSpec {
+  const MineSpec({required this.x, required this.gold});
+  final double x;
+  final int gold;
+}
+
 class TutorialStep {
   const TutorialStep({
     required this.id,
@@ -110,7 +116,14 @@ class TutorialStep {
   /// One of: tap, recruit, attack, defend, ability.
   final String advance;
 
-  static const _advances = {'tap', 'recruit', 'attack', 'defend', 'ability'};
+  static const _advances = {
+    'tap',
+    'recruit',
+    'attack',
+    'defend',
+    'garrison',
+    'ability',
+  };
 
   factory TutorialStep.fromJson(Map<String, dynamic> j, String ctx) {
     final advance = optString(j, 'advance', 'tap');
@@ -149,6 +162,8 @@ class LevelModel {
     required this.starFortressThreshold,
     required this.enemy,
     required this.tutorial,
+    required this.startingMiners,
+    required this.mines,
   });
 
   final int id;
@@ -169,6 +184,8 @@ class LevelModel {
   final double starFortressThreshold;
   final EnemyConfig enemy;
   final List<TutorialStep> tutorial;
+  final int startingMiners;
+  final List<MineSpec> mines;
 
   String get tutorialKey => 'level_$id';
 
@@ -190,6 +207,22 @@ class LevelModel {
         tutorial.add(
           TutorialStep.fromJson(asMap(s, '$ctx.tutorial[]'), '$ctx.tutorial[]'),
         );
+      }
+    }
+    final mines = <MineSpec>[];
+    if (j.containsKey('mines')) {
+      for (final m in asList(j['mines'], '$ctx.mines')) {
+        final mm = asMap(m, '$ctx.mines[]');
+        final spec = MineSpec(
+          x: reqDouble(mm, 'x', '$ctx.mines[]'),
+          gold: reqInt(mm, 'gold', '$ctx.mines[]'),
+        );
+        check(
+          spec.x > 0 && spec.gold > 0,
+          ctx,
+          'mines need x > 0 and gold > 0',
+        );
+        mines.add(spec);
       }
     }
     final level = LevelModel(
@@ -214,6 +247,14 @@ class LevelModel {
         '$ctx.enemy',
       ),
       tutorial: tutorial,
+      startingMiners: optInt(j, 'startingMiners', ctx, 2),
+      mines: mines,
+    );
+    check(level.startingMiners >= 0, ctx, 'startingMiners must be >= 0');
+    check(
+      level.startingMiners == 0 || level.mines.isNotEmpty,
+      ctx,
+      'miners need at least one mine',
     );
     check(
       level.unlockedUnits.isNotEmpty,

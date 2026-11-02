@@ -10,8 +10,11 @@ import '../kingdoms_game.dart';
 import '../painters/unit_painter.dart';
 import '../systems/movement_system.dart';
 import 'damageable.dart';
+import 'mine_component.dart';
 
 enum UnitState { spawning, idle, moving, attacking, dying }
+
+enum _MinerPhase { toMine, digging, toBase }
 
 /// A soldier. Uses an explicit state machine:
 /// spawning -> idle <-> moving <-> attacking -> dying -> removed.
@@ -60,6 +63,13 @@ class UnitComponent extends PositionComponent implements Damageable {
   double _walk = 0;
   double _time = 0;
   bool _removed = false;
+  bool hidden = false;
+
+  // Miner state.
+  _MinerPhase _phase = _MinerPhase.toMine;
+  MineComponent? _mine;
+  double _digTimer = 0;
+  int _carried = 0;
 
   final UnitVisual _visual = UnitVisual();
 
@@ -70,6 +80,9 @@ class UnitComponent extends PositionComponent implements Damageable {
 
   @override
   bool get isAlive => state != UnitState.dying && health > 0;
+
+  @override
+  bool get targetable => isAlive && !hidden;
 
   @override
   double get damageReduction {
@@ -102,6 +115,8 @@ class UnitComponent extends PositionComponent implements Damageable {
   }
 
   void _die() {
+    _releaseMine();
+    _carried = 0;
     state = UnitState.dying;
     _deathTimer = 0;
     target = null;
@@ -134,6 +149,11 @@ class UnitComponent extends PositionComponent implements Damageable {
       (px - _anchorX).abs() <= GameConfig.defendRadius;
 
   double get attackPhase {
+    if (model.kind == UnitKind.miner) {
+      return (_phase == _MinerPhase.digging && state != UnitState.dying)
+          ? ((_digTimer % 0.8) / 0.8) * 0.9
+          : -1;
+    }
     if (state != UnitState.attacking) return -1;
     final w = model.windup <= 0 ? 0.01 : model.windup;
     if (_attackElapsed < w) return (_attackElapsed / w) * 0.55;
@@ -164,12 +184,120 @@ class UnitComponent extends PositionComponent implements Damageable {
       if (state != UnitState.idle) state = UnitState.idle;
       return;
     }
+    if (_command == Command.garrison) {
+      _garrison(dt);
+      return;
+    }
+    if (hidden) hidden = false; // come back out of the statue
+    if (model.kind == UnitKind.miner) {
+      _updateMiner(dt);
+      return;
+    }
     cooldownLeft = max(0.0, cooldownLeft - dt * game.attackSpeedFor(team));
     if (state == UnitState.attacking) {
       _updateAttack(dt);
     } else {
       _updateMobile(dt);
     }
+  }
+
+  // --- Garrison -------------------------------------------------------------
+
+  void _garrison(double dt) {
+    if (hidden) {
+      state = UnitState.idle;
+      return;
+    }
+    target = null;
+    if (state == UnitState.attacking) state = UnitState.idle;
+    final goal = game.fortressOf(team).frontX - team.direction * 6;
+    final diff = goal - x;
+    if (diff.abs() < 8) {
+      hidden = true;
+      state = UnitState.idle;
+      _releaseMine();
+      return;
+    }
+    facing = diff >= 0 ? 1.0 : -1.0;
+    _stepX(diff.sign, dt, maxDistance: diff.abs(), ignoreBlocking: true);
+  }
+
+  // --- Mining ---------------------------------------------------------------
+
+  void _releaseMine() {
+    final m = _mine;
+    if (m != null && _phase == _MinerPhase.digging && m.occupants > 0) {
+      m.occupants--;
+    }
+    _mine = null;
+    if (_phase == _MinerPhase.digging) _phase = _MinerPhase.toMine;
+  }
+
+  void _updateMiner(double dt) {
+    final base = game.fortressOf(team);
+    switch (_phase) {
+      case _MinerPhase.toMine:
+        var m = _mine;
+        if (m == null || m.depleted) {
+          m = game.pickMine(x, team);
+          _mine = m;
+        }
+        if (m == null) {
+          // No gold left (or no mine on this side): wait near the statue.
+          _walkTo(base.frontX + team.direction * 40, dt);
+          return;
+        }
+        final goal = m.x - team.direction * 22;
+        if ((goal - x).abs() < 5) {
+          if (!m.hasRoom) {
+            state = UnitState.idle;
+            return;
+          }
+          m.occupants++;
+          _phase = _MinerPhase.digging;
+          _digTimer = 0;
+          state = UnitState.idle;
+          facing = team.direction;
+        } else {
+          _walkTo(goal, dt);
+        }
+        break;
+      case _MinerPhase.digging:
+        state = UnitState.idle;
+        _digTimer += dt;
+        if (_digTimer >= GameConfig.digSeconds) {
+          final m = _mine;
+          if (m != null) {
+            _carried = m.take(game.carryCapacity);
+            if (m.occupants > 0) m.occupants--;
+          }
+          _phase = _MinerPhase.toBase;
+        }
+        break;
+      case _MinerPhase.toBase:
+        final goal = base.frontX + team.direction * 14;
+        if ((goal - x).abs() < 6) {
+          if (_carried > 0) {
+            game.depositGold(this, _carried);
+            _carried = 0;
+          }
+          _phase = _MinerPhase.toMine;
+          state = UnitState.idle;
+        } else {
+          _walkTo(goal, dt);
+        }
+        break;
+    }
+  }
+
+  void _walkTo(double goalX, double dt) {
+    final diff = goalX - x;
+    if (diff.abs() < 3) {
+      state = UnitState.idle;
+      return;
+    }
+    facing = diff >= 0 ? 1.0 : -1.0;
+    _stepX(diff.sign, dt, maxDistance: diff.abs(), ignoreBlocking: true);
   }
 
   void _smoothLane(double dt) {
@@ -233,7 +361,7 @@ class UnitComponent extends PositionComponent implements Damageable {
   }
 
   bool _isTargetValid(Damageable t) {
-    if (!t.isAlive) return false;
+    if (!t.targetable) return false;
     if (_command == Command.attack) return true;
     if (t.gapFrom(x) <= model.attackRange) return true;
     return model.kind == UnitKind.melee &&
@@ -246,7 +374,7 @@ class UnitComponent extends PositionComponent implements Damageable {
     UnitComponent? best;
     var bestDist = double.infinity;
     for (final e in game.unitsOf(team.opponent)) {
-      if (!e.isAlive) continue;
+      if (!e.targetable) continue;
       final inRange = e.gapFrom(x) <= model.attackRange;
       if (!attacking && !inRange) {
         if (model.kind != UnitKind.melee || !_inDefendZone(e.x)) continue;
@@ -286,12 +414,14 @@ class UnitComponent extends PositionComponent implements Damageable {
     double dt, {
     double speedMult = 1.0,
     double? maxDistance,
+    bool ignoreBlocking = false,
   }) {
     if (dir == 0) {
       state = UnitState.idle;
       return false;
     }
-    if (MovementSystem.isBlocked(this, dir, game.unitsOf(team))) {
+    if (!ignoreBlocking &&
+        MovementSystem.isBlocked(this, dir, game.unitsOf(team))) {
       _blockedTime += dt;
       if (_blockedTime > 0.5) {
         _trySwitchLane();
@@ -368,6 +498,8 @@ class UnitComponent extends PositionComponent implements Damageable {
           game.combat.dealDamage(t, dmg, heavy: model.scale >= 1.5);
         }
         break;
+      case UnitKind.miner:
+        break;
       case UnitKind.ranged:
       case UnitKind.mage:
         game.spawnProjectile(
@@ -384,6 +516,7 @@ class UnitComponent extends PositionComponent implements Damageable {
 
   @override
   void render(Canvas canvas) {
+    if (hidden) return;
     final v = _visual;
     v.unitId = model.id;
     v.team = team;
@@ -401,6 +534,7 @@ class UnitComponent extends PositionComponent implements Damageable {
         : 1;
     v.buffed = team == Team.player && game.rallyActive;
     v.time = _time;
+    v.carrying = _carried > 0;
     UnitPainter.paint(canvas, v);
 
     if (state == UnitState.dying) return;

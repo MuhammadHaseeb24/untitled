@@ -24,7 +24,8 @@ class MovementSystem {
     List<UnitComponent> allies,
   ) {
     for (final a in allies) {
-      if (identical(a, unit) || !a.isAlive) continue;
+      if (identical(a, unit) || !a.targetable) continue;
+      if (a.model.kind == UnitKind.miner) continue;
       if (a.state == UnitState.spawning) continue;
       if (a.lane != unit.lane) continue;
       if (unit.model.kind == UnitKind.melee && a.model.kind != UnitKind.melee)

@@ -7,7 +7,7 @@ extension TeamX on Team {
   double get direction => this == Team.player ? 1.0 : -1.0;
 }
 
-enum Command { attack, defend }
+enum Command { garrison, defend, attack }
 
 enum RecruitResult { ok, notActive, locked, noGold, populationFull }
 

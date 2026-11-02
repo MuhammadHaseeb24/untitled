@@ -258,8 +258,12 @@ class _BattleScreenState extends State<BattleScreen>
     ];
     final abilityModels = [
       for (final id in _level.availableAbilities)
-        if (_app.data.abilities[id] != null) _app.data.abilities[id]!,
+        if (id != 'spear_volley' && _app.data.abilities[id] != null)
+          _app.data.abilities[id]!,
     ];
+    final spearModel = _level.availableAbilities.contains('spear_volley')
+        ? _app.data.abilities['spear_volley']
+        : null;
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.end,
@@ -270,8 +274,9 @@ class _BattleScreenState extends State<BattleScreen>
             current: hud.command,
             size: btn,
             onSelect: _game.setCommand,
-            attackWrap: (child) => _hl('attack', child),
-            defendWrap: (child) => _hl('defend', child),
+            garrisonWrap: (child) => _hl('garrison', child, radius: 40),
+            attackWrap: (child) => _hl('attack', child, radius: 40),
+            defendWrap: (child) => _hl('defend', child, radius: 40),
           ),
         ),
         Expanded(
@@ -322,10 +327,12 @@ class _BattleScreenState extends State<BattleScreen>
                             padding: const EdgeInsets.symmetric(horizontal: 3),
                             child: _hl(
                               'recruit',
+                              radius: 40,
                               UnitRecruitButton(
                                 model: m,
                                 gold: hud.gold,
                                 size: btn * 0.92,
+                                queued: hud.queuedByUnit[m.id] ?? 0,
                                 onTap: () => _game.recruit(m.id),
                               ),
                             ),
@@ -362,6 +369,27 @@ class _BattleScreenState extends State<BattleScreen>
                     ),
                   ),
               ],
+            ),
+          ),
+        if (spearModel != null)
+          Padding(
+            padding: const EdgeInsets.only(left: 12),
+            child: ListenableBuilder(
+              listenable: hud,
+              builder: (context, _) => _hl(
+                'spear',
+                radius: 60,
+                AbilityButton(
+                  model: spearModel,
+                  big: true,
+                  cooldownFraction: hud.abilityCooldown[spearModel.id] ?? 0,
+                  remainingSeconds:
+                      hud.abilityRemainingSeconds[spearModel.id] ?? 0,
+                  size: btn * 1.05,
+                  enabled: !hud.battleOver,
+                  onTap: () => _game.useAbility(spearModel.id),
+                ),
+              ),
             ),
           ),
       ],

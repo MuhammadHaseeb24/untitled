@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../app/app_theme.dart';
 import '../game/battle_hud.dart';
 import '../game/systems/level_system.dart';
+import 'glossy.dart';
 
 class _Chip extends StatelessWidget {
   const _Chip({
@@ -24,9 +25,9 @@ class _Chip extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         decoration: BoxDecoration(
-          color: const Color(0xCC12142A),
+          color: const Color(0x66000000),
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: Colors.white24),
+          border: Border.all(color: const Color(0xFFF2C14E), width: 1.6),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -126,97 +127,116 @@ class BattleTopBar extends StatelessWidget {
       builder: (context, _) {
         final pf = hud.playerMaxHp <= 0 ? 0.0 : hud.playerHp / hud.playerMaxHp;
         final ef = hud.enemyMaxHp <= 0 ? 0.0 : hud.enemyHp / hud.enemyMaxHp;
-        return Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            IconButton.filled(
-              style: IconButton.styleFrom(
-                backgroundColor: const Color(0xCC12142A),
-                minimumSize: const Size(48, 48),
-              ),
-              tooltip: 'Pause',
-              icon: const Icon(Icons.pause_rounded, size: 28),
-              onPressed: onPause,
-            ),
-            const SizedBox(width: 8),
-            goldWrap(
-              _Chip(
-                icon: Icons.monetization_on_rounded,
-                color: AppColors.gold,
-                text: '${hud.gold}',
-                label: 'Gold',
-              ),
-            ),
-            const SizedBox(width: 6),
-            _Chip(
-              icon: Icons.groups_rounded,
-              color: AppColors.blue,
-              text: '${hud.population}/${hud.populationMax}',
-              label: 'Population',
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Row(
-                children: [
-                  Expanded(
-                    child: _HpBar(
-                      fraction: pf,
-                      color: AppColors.good,
-                      label: 'YOUR FORTRESS',
-                      alignRight: false,
-                    ),
+        return WoodPanel(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Semantics(
+                button: true,
+                label: 'Pause',
+                child: GlossyCircle(
+                  diameter: 48,
+                  colors: const [
+                    Color(0xFFFFF08A),
+                    Color(0xFFF2C500),
+                    Color(0xFFB88700),
+                  ],
+                  onTap: onPause,
+                  child: const Icon(
+                    Icons.pause_rounded,
+                    size: 28,
+                    color: Color(0xFF3A2A08),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          ResultCalculator.formatTime(hud.elapsed),
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w900,
-                          ),
-                        ),
-                        Text(
-                          levelName,
-                          style: const TextStyle(
-                            fontSize: 10,
-                            color: AppColors.textDim,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
-                    ),
-                  ),
-                  Expanded(
-                    child: _HpBar(
-                      fraction: ef,
-                      color: AppColors.bad,
-                      label: 'ENEMY FORTRESS',
-                      alignRight: true,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(width: 8),
-            TextButton(
-              style: TextButton.styleFrom(
-                backgroundColor: const Color(0xCC12142A),
-                foregroundColor: AppColors.text,
-                minimumSize: const Size(52, 48),
-              ),
-              onPressed: onToggleSpeed,
-              child: Text(
-                hud.speed >= 2 ? '2x' : '1x',
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w900,
                 ),
               ),
-            ),
-          ],
+              const SizedBox(width: 10),
+              goldWrap(
+                _Chip(
+                  icon: Icons.monetization_on_rounded,
+                  color: AppColors.gold,
+                  text: '${hud.gold}',
+                  label: 'Gold',
+                ),
+              ),
+              const SizedBox(width: 6),
+              _Chip(
+                icon: Icons.groups_rounded,
+                color: const Color(0xFFBFD7FF),
+                text: '${hud.population}/${hud.populationMax}',
+                label: 'Population',
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: _HpBar(
+                        fraction: pf,
+                        color: AppColors.good,
+                        label: 'YOUR STATUE',
+                        alignRight: false,
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            ResultCalculator.formatTime(hud.elapsed),
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w900,
+                              color: Colors.white,
+                            ),
+                          ),
+                          Text(
+                            levelName,
+                            style: const TextStyle(
+                              fontSize: 10,
+                              color: Color(0xFFF3E1B5),
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      child: _HpBar(
+                        fraction: ef,
+                        color: const Color(0xFFE5231B),
+                        label: 'ENEMY STATUE',
+                        alignRight: true,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 10),
+              Semantics(
+                button: true,
+                label: 'Game speed',
+                child: GlossyCircle(
+                  diameter: 48,
+                  colors: const [
+                    Color(0xFF8FD0FF),
+                    Color(0xFF3E82D6),
+                    Color(0xFF1B4488),
+                  ],
+                  borderColor: Colors.white,
+                  onTap: onToggleSpeed,
+                  child: Text(
+                    hud.speed >= 2 ? '2x' : '1x',
+                    style: const TextStyle(
+                      fontSize: 17,
+                      fontWeight: FontWeight.w900,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
         );
       },
     );
