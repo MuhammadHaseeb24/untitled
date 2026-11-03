@@ -1,7 +1,7 @@
 # Kingdoms of Ember
 
 Original fantasy lane-based army strategy game for Android, built with **Flutter + Flame**.
-Landscape, offline, single-player campaign with 10 levels, 5 unit types, 3 abilities, upgrades, tutorial and saved progress.
+Landscape, offline, single-player campaign with 320 levels, 5 unit types, 3 abilities, upgrades, tutorial and saved progress.
 
 > **Status honesty:** this source was written and statically checked without a Flutter SDK or Android device
 > available. The pure game logic (economy, recruit queue, cooldowns, stars/rewards, save parsing, enemy AI, data files)
@@ -44,6 +44,15 @@ If `flutter pub get` complains about a package version, run `flutter pub upgrade
 * Ember Coins (persistent) come from first-time level rewards and new stars only, so replays never duplicate rewards. Spend them in **Army Upgrades**. Battle gold resets every battle.
 * Maps rotate: night statue field, snow mountains with an orange sun, brown desert with braziers.
 
+### The 320-level campaign
+
+* 8 chapters of 40 levels (Ember Plains, Frostbound Reach, Sunscorched Dunes, Cinder Highlands, Twilight Wilds, Stormcrag Fields, Ashen Frontier, The Crown Wars). Levels 1-10 are hand-made with the tutorial; 11-320 come from `tools/generate_levels.py`.
+* 18 challenge types, each with its own rules and enemy: Balanced Siege, Early Rush, Gold Famine, Gold Rush, Archer Nest, Iron Wall, Giant Hunt, Mage Storm, **Survival** (outlast a countdown), **Last Stand** (start with an army, survive), Swarm, Siege Breaker, Defender, Quick Strike, Elite Guard, Rich Start, Long Road, Limited Arsenal (only some units allowed), plus a **Boss Battle** every 10th level from level 20.
+* 6 map themes: night field, snow mountains, desert, volcano, twilight forest, storm with rain and lightning.
+* Every level also varies: number, size and distance of gold piles, starting miners and gold, enemy unit mix, rush time, wave schedule, statue strength, par time and reward. Enemy strength grows with the level number.
+* To change or extend the campaign, edit the tables at the top of `tools/generate_levels.py` and run `python3 tools/generate_levels.py` (it rewrites `assets/data/levels.json`). Levels load from that JSON, so you can also hand-edit any single level.
+* Upgrades now go to level 20 each, so coins stay useful through the whole campaign.
+
 ## 3. Architecture
 
 | Folder | Responsibility |
@@ -72,7 +81,7 @@ The world is a virtual 1600x720 space scaled to any aspect ratio (letterboxing i
 
 ## 6. Known limitations / not done
 
-* Balance is untested. Numbers in the JSON files are starting values only.
+* Balance is untested, especially the generated levels 11-320 (their difficulty curve is a first guess). Numbers in the JSON files are starting values only.
 * Audio is simple generated placeholder sound (`tools/generate_audio.py`); art is procedural. Replace with produced assets for a store release.
 * Not implemented: language selection, privacy-policy link, daily reward, battle resume after app kill (the pause menu appears when you return), individual unit selection, widget/integration tests.
 * Ember Burst auto-targets the largest enemy cluster (no manual aiming).

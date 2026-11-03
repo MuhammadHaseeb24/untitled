@@ -19,14 +19,14 @@ Map<String, dynamic> _json(String file) =>
         as Map<String, dynamic>;
 
 Map<String, UnitModel> _units() => {
-  for (final u in (_json('units.json')['units'] as List))
-    (u as Map<String, dynamic>)['id'] as String: UnitModel.fromJson(u),
-};
+      for (final u in (_json('units.json')['units'] as List))
+        (u as Map<String, dynamic>)['id'] as String: UnitModel.fromJson(u),
+    };
 
 List<LevelModel> _levels() => [
-  for (final l in (_json('levels.json')['levels'] as List))
-    LevelModel.fromJson(l as Map<String, dynamic>),
-];
+      for (final l in (_json('levels.json')['levels'] as List))
+        LevelModel.fromJson(l as Map<String, dynamic>),
+    ];
 
 void main() {
   group('Economy', () {
@@ -184,7 +184,7 @@ void main() {
           (a as Map<String, dynamic>)['id'] as String: AbilityModel.fromJson(a),
       };
       final levels = _levels();
-      expect(levels.length, 10);
+      expect(levels.length >= 300, isTrue);
       for (var i = 0; i < levels.length; i++) {
         expect(levels[i].id, i + 1);
         for (final id in [
@@ -230,8 +230,8 @@ void main() {
         'population': 99,
         'army_damage': 2,
       });
-      expect(b.populationBonus, 5);
-      expect(b.damageMultiplier, closeTo(1.10, 1e-9));
+      expect(b.populationBonus, 20);
+      expect(b.damageMultiplier, closeTo(1.06, 1e-9));
     });
   });
 
@@ -318,7 +318,7 @@ void main() {
     test('every level starts with no passive income and has gold mines', () {
       for (final l in _levels()) {
         expect(l.passiveIncome, 0, reason: 'level ${l.id}');
-        expect(l.startingGold, 0, reason: 'level ${l.id}');
+        expect(l.startingGold <= 600, isTrue, reason: 'level ${l.id}');
         expect(l.startingMiners > 0, isTrue);
         expect(l.mines.isNotEmpty, isTrue);
         expect(l.unlockedUnits.first, 'miner');
@@ -337,12 +337,12 @@ void main() {
           UpgradeModel.fromJson(u as Map<String, dynamic>),
       ];
       final b = UpgradeBonuses.fromLevels(models, {'eco_income': 3});
-      expect(b.miningBonus, 6);
+      expect(b.miningBonus, 3);
     });
 
     test('every level has an early enemy rush wave', () {
       for (final l in _levels()) {
-        expect(l.enemy.waves.first.at <= 60, isTrue, reason: 'level ${l.id}');
+        expect(l.enemy.waves.first.at <= 100, isTrue, reason: 'level ${l.id}');
       }
     });
   });
@@ -372,6 +372,83 @@ void main() {
       expect(c.ready, isFalse);
       c.tick(0.2);
       expect(c.ready, isTrue);
+    });
+  });
+
+  group('Level catalogue (300+ levels)', () {
+    test('has 300+ contiguous levels with unique names', () {
+      final levels = _levels();
+      expect(levels.length >= 300, isTrue);
+      for (var i = 0; i < levels.length; i++) {
+        expect(levels[i].id, i + 1);
+      }
+      final names = levels.map((l) => l.name).toSet();
+      expect(names.length, levels.length);
+    });
+
+    test('levels are clearly different from each other', () {
+      final levels = _levels();
+      final tags = levels.map((l) => l.tag).toSet();
+      expect(tags.length >= 15, isTrue, reason: 'challenge types: $tags');
+      final chapters = levels.map((l) => l.chapter).toSet();
+      expect(chapters.length, 8);
+      final themes = levels.map((l) => l.theme % 6).toSet();
+      expect(themes.length, 6);
+      final signatures = <String>{};
+      for (final l in levels.skip(10)) {
+        final sig = [
+          l.tag,
+          l.theme,
+          l.mines.length,
+          l.enemy.buildOrder.join(','),
+          l.enemyFortressHealth,
+          l.enemy.firstAttackAfterSeconds,
+        ].join('|');
+        expect(signatures.add(sig), isTrue,
+            reason: 'duplicate level shape at ${l.id}');
+      }
+    });
+
+    test('survival, last stand and boss levels are configured', () {
+      final levels = _levels();
+      final survival = levels.where((l) => l.isSurvival).toList();
+      expect(survival.length >= 15, isTrue);
+      for (final l in survival) {
+        expect(l.surviveSeconds >= 120 && l.surviveSeconds <= 430, isTrue);
+      }
+      final lastStands = levels.where((l) => l.tag == 'Last Stand').toList();
+      expect(lastStands.isNotEmpty, isTrue);
+      for (final l in lastStands) {
+        expect(l.startingArmy.isNotEmpty, isTrue);
+      }
+      for (final l in levels) {
+        if (l.id >= 20 && l.id % 10 == 0) expect(l.tag, 'Boss Battle');
+      }
+    });
+
+    test('difficulty rises across chapters', () {
+      final levels = _levels();
+      double avg(int from, int to) {
+        final slice = levels.sublist(from, to);
+        var total = 0.0;
+        for (final l in slice) {
+          total += l.enemyFortressHealth * l.enemy.healthMultiplier;
+        }
+        return total / slice.length;
+      }
+
+      expect(avg(280, 320) > avg(0, 40) * 2, isTrue);
+    });
+
+    test('restricted levels keep at least one melee unit and miners', () {
+      for (final l in _levels().where((l) => l.tag == 'Limited Arsenal')) {
+        expect(l.unlockedUnits.first, 'miner');
+        expect(
+            l.unlockedUnits.contains('ember_squire') ||
+                l.unlockedUnits.contains('iron_guard'),
+            isTrue);
+        expect(l.unlockedUnits.length, 4);
+      }
     });
   });
 }

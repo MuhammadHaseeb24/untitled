@@ -86,7 +86,11 @@ class GameData {
     }
     for (final level in levels) {
       final ctx = 'level ${level.id}';
-      for (final id in [...level.unlockedUnits, ...level.enemyUnitIds]) {
+      for (final id in [
+        ...level.unlockedUnits,
+        ...level.enemyUnitIds,
+        ...level.startingArmy,
+      ]) {
         check(units.containsKey(id), ctx, 'unknown unit "$id"');
       }
       for (final id in level.availableAbilities) {

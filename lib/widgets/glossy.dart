@@ -164,18 +164,20 @@ class _WoodGrainPainter extends CustomPainter {
 
 /// Beveled dark panel used by dialogs.
 BoxDecoration bevelPanel({Color border = AppColors.gold}) => BoxDecoration(
-  borderRadius: BorderRadius.circular(20),
-  gradient: const LinearGradient(
-    begin: Alignment.topCenter,
-    end: Alignment.bottomCenter,
-    colors: [Color(0xFF2B2F52), Color(0xFF181B33)],
-  ),
-  border: Border.all(color: border, width: 3),
-  boxShadow: const [
-    BoxShadow(color: Color(0xCC000000), blurRadius: 24, offset: Offset(0, 10)),
-    BoxShadow(color: Color(0x33FFFFFF), blurRadius: 0, offset: Offset(0, -1)),
-  ],
-);
+      borderRadius: BorderRadius.circular(20),
+      gradient: const LinearGradient(
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+        colors: [Color(0xFF2B2F52), Color(0xFF181B33)],
+      ),
+      border: Border.all(color: border, width: 3),
+      boxShadow: const [
+        BoxShadow(
+            color: Color(0xCC000000), blurRadius: 24, offset: Offset(0, 10)),
+        BoxShadow(
+            color: Color(0x33FFFFFF), blurRadius: 0, offset: Offset(0, -1)),
+      ],
+    );
 
 /// Three white spears crossing diagonally; the Spear Volley icon.
 class SpearIcon extends StatelessWidget {
@@ -186,10 +188,10 @@ class SpearIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => SizedBox(
-    width: size,
-    height: size,
-    child: CustomPaint(painter: _SpearIconPainter(color)),
-  );
+        width: size,
+        height: size,
+        child: CustomPaint(painter: _SpearIconPainter(color)),
+      );
 }
 
 class _SpearIconPainter extends CustomPainter {

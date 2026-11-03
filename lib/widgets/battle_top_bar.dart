@@ -63,9 +63,8 @@ class _HpBar extends StatelessWidget {
     return Semantics(
       label: '$label ${(fraction * 100).round()} percent',
       child: Column(
-        crossAxisAlignment: alignRight
-            ? CrossAxisAlignment.end
-            : CrossAxisAlignment.start,
+        crossAxisAlignment:
+            alignRight ? CrossAxisAlignment.end : CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
@@ -183,7 +182,9 @@ class BattleTopBar extends StatelessWidget {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            ResultCalculator.formatTime(hud.elapsed),
+                            hud.surviveTotal > 0
+                                ? 'SURVIVE ${ResultCalculator.formatTime((hud.surviveTotal - hud.elapsed).clamp(0.0, hud.surviveTotal).toDouble())}'
+                                : ResultCalculator.formatTime(hud.elapsed),
                             style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w900,

@@ -46,9 +46,8 @@ class UnitRecruitButton extends StatelessWidget {
                     Color(0xFFF2C500),
                     Color(0xFFB88700),
                   ],
-                  borderColor: affordable
-                      ? Colors.white
-                      : const Color(0xFF8A6B3A),
+                  borderColor:
+                      affordable ? Colors.white : const Color(0xFF8A6B3A),
                   borderWidth: affordable ? 3 : 2,
                   onTap: onTap,
                   child: UnitPortrait(unitId: model.id, size: d * 0.86),

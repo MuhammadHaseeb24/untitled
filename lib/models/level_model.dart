@@ -164,6 +164,10 @@ class LevelModel {
     required this.tutorial,
     required this.startingMiners,
     required this.mines,
+    required this.tag,
+    required this.chapter,
+    required this.surviveSeconds,
+    required this.startingArmy,
   });
 
   final int id;
@@ -186,6 +190,18 @@ class LevelModel {
   final List<TutorialStep> tutorial;
   final int startingMiners;
   final List<MineSpec> mines;
+
+  /// Short label shown on the level card (e.g. "Gold Famine").
+  final String tag;
+  final String chapter;
+
+  /// > 0 for survival levels: win by keeping your statue alive this long.
+  final double surviveSeconds;
+
+  /// Units you start the battle with (e.g. "Last Stand" levels).
+  final List<String> startingArmy;
+
+  bool get isSurvival => surviveSeconds > 0;
 
   String get tutorialKey => 'level_$id';
 
@@ -249,7 +265,12 @@ class LevelModel {
       tutorial: tutorial,
       startingMiners: optInt(j, 'startingMiners', ctx, 2),
       mines: mines,
+      tag: optString(j, 'tag', ''),
+      chapter: optString(j, 'chapter', ''),
+      surviveSeconds: optDouble(j, 'surviveSeconds', ctx, 0),
+      startingArmy: optStringList(j, 'startingArmy', ctx),
     );
+    check(level.surviveSeconds >= 0, ctx, 'surviveSeconds must be >= 0');
     check(level.startingMiners >= 0, ctx, 'startingMiners must be >= 0');
     check(
       level.startingMiners == 0 || level.mines.isNotEmpty,

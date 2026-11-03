@@ -11,13 +11,15 @@ class _Star {
 }
 
 /// Level backdrops, drawn in virtual coordinates and extended beyond the
-/// world so letterboxing is seamless. Theme (level.theme % 3):
+/// world so letterboxing is seamless. Theme (level.theme % 6):
 /// 0 = night field with a moon, 1 = snow mountains with an orange sun,
-/// 2 = brown desert with pyramids and flame braziers.
+/// 2 = brown desert with pyramids and flame braziers, 3 = volcano with
+/// ash and lava, 4 = twilight forest with fireflies, 5 = storm with rain
+/// and lightning.
 class BattlefieldBackground extends Component {
   BattlefieldBackground({required int theme, required this.lowQuality})
-    : mode = theme.abs() % 3,
-      super(priority: 0) {
+      : mode = theme.abs() % 6,
+        super(priority: 0) {
     final r = Random(theme * 13 + 7);
     final starCount = lowQuality ? 35 : 90;
     for (var i = 0; i < starCount; i++) {
@@ -47,6 +49,30 @@ class BattlefieldBackground extends Component {
           Color(0xFFA27A4A),
           Color(0xFF86633A),
           Color(0xFF5E4426),
+        ];
+        break;
+      case 3:
+        sky = const [Color(0xFF1A0505), Color(0xFF5A1408), Color(0xFFD2501A)];
+        ground = const [
+          Color(0xFF4A3530),
+          Color(0xFF332320),
+          Color(0xFF170F0D),
+        ];
+        break;
+      case 4:
+        sky = const [Color(0xFF1B1038), Color(0xFF5B2A78), Color(0xFFE0709A)];
+        ground = const [
+          Color(0xFF2E6B63),
+          Color(0xFF225650),
+          Color(0xFF143A38),
+        ];
+        break;
+      case 5:
+        sky = const [Color(0xFF262A34), Color(0xFF454E5C), Color(0xFF7A8594)];
+        ground = const [
+          Color(0xFF55645A),
+          Color(0xFF3F4C45),
+          Color(0xFF2A332E),
         ];
         break;
       default:
@@ -173,6 +199,15 @@ class BattlefieldBackground extends Component {
       case 2:
         _renderDesert(canvas);
         break;
+      case 3:
+        _renderVolcano(canvas);
+        break;
+      case 4:
+        _renderForest(canvas);
+        break;
+      case 5:
+        _renderStorm(canvas);
+        break;
       default:
         _renderNight(canvas);
     }
@@ -189,7 +224,9 @@ class BattlefieldBackground extends Component {
     final marks = _p
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2
-      ..color = mode == 0 ? const Color(0x3300230A) : const Color(0x22000000);
+      ..color = mode == 0
+          ? const Color(0x3300230A)
+          : (mode == 3 ? const Color(0x77FF6A1A) : const Color(0x22000000));
     for (var i = 0; i + 1 < _marks.length; i += 2) {
       canvas.drawLine(_marks[i], _marks[i + 1], marks);
     }
@@ -376,11 +413,209 @@ class BattlefieldBackground extends Component {
   }
 }
 
+extension _MoreThemes on BattlefieldBackground {
+  void _renderVolcano(Canvas canvas) {
+    // drifting ash / embers
+    for (final st in _stars) {
+      final y = (st.y - _t * 22 * st.r) % 330;
+      final a = (60 + 120 * (0.5 + 0.5 * sin(_t * 2 + st.phase))).round();
+      canvas.drawCircle(
+        Offset(st.x, y),
+        st.r * 1.1,
+        _p..color = Color.fromARGB(a, 255, 150, 60),
+      );
+    }
+    canvas.drawPath(_farHill, _p..color = const Color(0xFF2A1512));
+    for (final x in [260.0, 820.0, 1330.0]) {
+      const base = BattlefieldBackground._horizon + 40;
+      final cone = Path()
+        ..moveTo(x - 190, base)
+        ..lineTo(x - 36, base - 190)
+        ..lineTo(x + 36, base - 190)
+        ..lineTo(x + 190, base)
+        ..close();
+      canvas.drawPath(cone, _p..color = const Color(0xFF3A1D16));
+      // lava glow and streams
+      canvas.drawCircle(
+        Offset(x, base - 190),
+        44 + 4 * sin(_t * 3 + x),
+        _p..color = const Color(0x55FF6A1A),
+      );
+      canvas.drawOval(
+        Rect.fromCenter(center: Offset(x, base - 190), width: 74, height: 20),
+        _p..color = const Color(0xFFFF8A2B),
+      );
+      canvas.drawLine(
+        Offset(x - 10, base - 188),
+        Offset(x - 60, base - 60),
+        _p
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 5
+          ..color = const Color(0xCCFF6A1A),
+      );
+      canvas.drawLine(
+        Offset(x + 12, base - 188),
+        Offset(x + 50, base - 80),
+        _p..strokeWidth = 4,
+      );
+      _p.style = PaintingStyle.fill;
+      // smoke
+      for (var k = 0; k < 4; k++) {
+        final dy = (_t * 26 + k * 40) % 160;
+        canvas.drawCircle(
+          Offset(x + 14 * sin(_t + k), base - 200 - dy),
+          18 + dy * 0.18,
+          _p
+            ..color = Color.fromARGB(
+              (90 - dy * 0.5).round().clamp(0, 255),
+              40,
+              30,
+              30,
+            ),
+        );
+      }
+    }
+    canvas.drawPath(_midHill, _p..color = const Color(0xFF241210));
+  }
+
+  void _renderForest(Canvas canvas) {
+    for (final st in _stars) {
+      final tw = 0.5 + 0.5 * sin(_t * 1.4 + st.phase);
+      canvas.drawCircle(
+        Offset(st.x, st.y * 0.8),
+        st.r * 0.8,
+        _p..color = Color.fromARGB((170 * tw).round(), 255, 235, 255),
+      );
+    }
+    canvas.drawCircle(
+      const Offset(980, 120),
+      48,
+      _p..color = const Color(0x44FFD6F0),
+    );
+    canvas.drawCircle(
+      const Offset(980, 120),
+      34,
+      _p..color = const Color(0xFFF7DDF2),
+    );
+    canvas.drawPath(_farHill, _p..color = const Color(0xFF281645));
+    // two layers of dark pines
+    for (var layer = 0; layer < 2; layer++) {
+      final col =
+          layer == 0 ? const Color(0xFF1F1038) : const Color(0xFF2B1750);
+      for (final t in _pines) {
+        final bx = t.dx + layer * 22;
+        final by = BattlefieldBackground._horizon + 42 + layer * 8;
+        final hgt = (layer == 0 ? 60 : 44) + t.dy * 40;
+        for (var k = 0; k < 4; k++) {
+          final w = hgt * (0.34 - k * 0.05);
+          final y = by - k * hgt * 0.22;
+          final tri = Path()
+            ..moveTo(bx - w, y)
+            ..lineTo(bx, y - hgt * 0.42)
+            ..lineTo(bx + w, y)
+            ..close();
+          canvas.drawPath(tri, _p..color = col);
+        }
+      }
+    }
+    // fireflies
+    for (final st in _stars) {
+      final fx = st.x + 20 * sin(_t * 0.6 + st.phase);
+      final fy = BattlefieldBackground._horizon +
+          60 +
+          (st.y % 230) +
+          12 * cos(_t * 0.7 + st.phase);
+      final a = (60 + 190 * (0.5 + 0.5 * sin(_t * 3 + st.phase * 2))).round();
+      canvas.drawCircle(
+        Offset(fx, fy),
+        6,
+        _p..color = Color.fromARGB(a ~/ 3, 230, 255, 120),
+      );
+      canvas.drawCircle(
+        Offset(fx, fy),
+        2,
+        _p..color = Color.fromARGB(a, 255, 255, 160),
+      );
+    }
+  }
+
+  void _renderStorm(Canvas canvas) {
+    // heavy clouds
+    for (final m in _peaks) {
+      final cx = m[0] + m[1] * 0.5;
+      final cy = 70 + (m[2] % 90);
+      canvas.drawOval(
+        Rect.fromCenter(center: Offset(cx, cy), width: m[1] * 1.5, height: 80),
+        _p..color = const Color(0xCC1E222B),
+      );
+      canvas.drawOval(
+        Rect.fromCenter(
+          center: Offset(cx + 40, cy + 22),
+          width: m[1] * 1.1,
+          height: 60,
+        ),
+        _p..color = const Color(0xAA2D333F),
+      );
+    }
+    // lightning flash
+    final raw = sin(_t * 1.3) * sin(_t * 3.1 + 1);
+    final flash = raw > 0.55 ? pow((raw - 0.55) / 0.45, 2).toDouble() : 0.0;
+    if (flash > 0.02) {
+      canvas.drawRect(
+        const Rect.fromLTRB(
+          -2000,
+          -1500,
+          3600,
+          BattlefieldBackground._horizon + 40,
+        ),
+        _p..color = Color.fromARGB((flash * 120).round(), 235, 240, 255),
+      );
+      if (flash > 0.25) {
+        final bx = 200.0 + ((_t * 0.5).floor() * 397) % 1200;
+        final bolt = Path()
+          ..moveTo(bx, 60)
+          ..lineTo(bx - 30, 150)
+          ..lineTo(bx + 4, 160)
+          ..lineTo(bx - 46, 280)
+          ..lineTo(bx - 8, 285)
+          ..lineTo(bx - 40, 340);
+        canvas.drawPath(
+          bolt,
+          _p
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = 5
+            ..strokeJoin = StrokeJoin.round
+            ..color = Color.fromARGB(
+              (flash * 255).round().clamp(0, 255),
+              255,
+              255,
+              255,
+            ),
+        );
+        _p.style = PaintingStyle.fill;
+      }
+    }
+    canvas.drawPath(_farHill, _p..color = const Color(0xFF3A463F));
+    canvas.drawPath(_midHill, _p..color = const Color(0xFF2E3A34));
+    // rain
+    final rain = _p
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.6
+      ..color = const Color(0x66C8D8F0);
+    for (final st in _stars) {
+      final y = (st.y * 2.3 + _t * 520) % 760;
+      final x = (st.x - _t * 90) % 1700;
+      canvas.drawLine(Offset(x, y), Offset(x - 7, y + 20), rain);
+    }
+    _p.style = PaintingStyle.fill;
+  }
+}
+
 /// A few dark grass tufts drawn in front of the units at the bottom edge
 /// (night theme only).
 class ForegroundLayer extends Component {
   ForegroundLayer({required this.lowQuality, required int seed, this.theme = 0})
-    : super(priority: 900) {
+      : super(priority: 900) {
     final r = Random(seed + 21);
     final n = lowQuality ? 24 : 60;
     for (var i = 0; i < n; i++) {
@@ -399,7 +634,8 @@ class ForegroundLayer extends Component {
 
   @override
   void render(Canvas canvas) {
-    if (theme.abs() % 3 != 0) return;
+    final m = theme.abs() % 6;
+    if (m != 0 && m != 4) return;
     for (final t in _tufts) {
       canvas.drawLine(t, t.translate(-5, -16), _p);
       canvas.drawLine(t, t.translate(1, -20), _p);

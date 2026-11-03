@@ -8,6 +8,9 @@ class ResultCalculator {
 
   static const int coinsPerNewStar = 20;
 
+  /// Statue health needed for the 3rd star on survival levels.
+  static const double survivalTopHealth = 0.8;
+
   /// 1 star for winning, +1 for keeping the fortress above the level's health
   /// threshold, +1 for finishing within the par time.
   static int starsFor(
@@ -17,7 +20,12 @@ class ResultCalculator {
   ) {
     var stars = 1;
     if (fortressFraction >= level.starFortressThreshold) stars++;
-    if (timeSeconds <= level.parTimeSeconds) stars++;
+    if (level.isSurvival) {
+      // Survival levels: the third star is for a nearly untouched statue.
+      if (fortressFraction >= survivalTopHealth) stars++;
+    } else if (timeSeconds <= level.parTimeSeconds) {
+      stars++;
+    }
     return stars;
   }
 

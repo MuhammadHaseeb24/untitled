@@ -6,10 +6,10 @@
    "name": "Heavy Sacks",
    "description": "Miners carry more gold on every trip.",
    "effect": "mining_yield",
-   "perLevel": 2,
-   "maxLevel": 5,
-   "baseCost": 100,
-   "costGrowth": 1.6
+   "perLevel": 1,
+   "maxLevel": 20,
+   "baseCost": 80,
+   "costGrowth": 1.22
   },
   {
    "id": "eco_start",
@@ -17,10 +17,10 @@
    "name": "War Chest",
    "description": "Start every battle with extra gold.",
    "effect": "starting_gold",
-   "perLevel": 25,
-   "maxLevel": 4,
-   "baseCost": 80,
-   "costGrowth": 1.5
+   "perLevel": 15,
+   "maxLevel": 20,
+   "baseCost": 60,
+   "costGrowth": 1.2
   },
   {
    "id": "fort_health",
@@ -28,10 +28,10 @@
    "name": "Stone Skin",
    "description": "Your statue has more health.",
    "effect": "fortress_health",
-   "perLevel": 0.1,
-   "maxLevel": 5,
-   "baseCost": 120,
-   "costGrowth": 1.6
+   "perLevel": 0.06,
+   "maxLevel": 20,
+   "baseCost": 100,
+   "costGrowth": 1.22
   },
   {
    "id": "army_damage",
@@ -39,10 +39,10 @@
    "name": "Ember Steel",
    "description": "Your troops deal more damage.",
    "effect": "army_damage",
-   "perLevel": 0.05,
-   "maxLevel": 5,
-   "baseCost": 150,
-   "costGrowth": 1.7
+   "perLevel": 0.03,
+   "maxLevel": 20,
+   "baseCost": 120,
+   "costGrowth": 1.23
   },
   {
    "id": "army_health",
@@ -50,10 +50,10 @@
    "name": "Tempered Armor",
    "description": "Your troops have more health.",
    "effect": "army_health",
-   "perLevel": 0.05,
-   "maxLevel": 5,
-   "baseCost": 150,
-   "costGrowth": 1.7
+   "perLevel": 0.03,
+   "maxLevel": 20,
+   "baseCost": 120,
+   "costGrowth": 1.23
   },
   {
    "id": "population",
@@ -62,9 +62,9 @@
    "description": "Raise the maximum number of troops you can field.",
    "effect": "population",
    "perLevel": 1,
-   "maxLevel": 5,
-   "baseCost": 200,
-   "costGrowth": 1.7
+   "maxLevel": 20,
+   "baseCost": 150,
+   "costGrowth": 1.22
   }
  ]
 }

@@ -33,7 +33,7 @@ class AiOutput {
 /// rules as the player and only decides on a fixed interval.
 class EnemyAiSystem {
   EnemyAiSystem({required this.config, required this.catalog})
-    : _waves = List.of(config.waves);
+      : _waves = List.of(config.waves);
 
   final EnemyConfig config;
   final Map<String, UnitModel> catalog;

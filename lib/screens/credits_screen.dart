@@ -9,16 +9,16 @@ class CreditsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Widget h(String t) => Padding(
-      padding: const EdgeInsets.only(top: 16, bottom: 4),
-      child: Text(
-        t,
-        style: const TextStyle(
-          fontWeight: FontWeight.w900,
-          letterSpacing: 2,
-          color: AppColors.gold,
-        ),
-      ),
-    );
+          padding: const EdgeInsets.only(top: 16, bottom: 4),
+          child: Text(
+            t,
+            style: const TextStyle(
+              fontWeight: FontWeight.w900,
+              letterSpacing: 2,
+              color: AppColors.gold,
+            ),
+          ),
+        );
     const body = TextStyle(color: AppColors.text, height: 1.4);
     return GameScaffold(
       title: 'CREDITS',

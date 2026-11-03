@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
 import 'app/kingdom_app.dart';
 import 'services/app_state.dart';
 import 'services/audio_service.dart';

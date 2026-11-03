@@ -27,9 +27,8 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
     });
   }
 
-  void _push(Widget screen) =>
-      Navigator.of(context)
-          .push(MaterialPageRoute<void>(builder: (_) => screen));
+  void _push(Widget screen) => Navigator.of(context)
+      .push(MaterialPageRoute<void>(builder: (_) => screen));
 
   @override
   Widget build(BuildContext context) {
@@ -128,10 +127,10 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
                               icon: Icons.fast_forward_rounded,
                               onPressed: hasProgress
                                   ? () => _push(
-                                      BattleScreen(
-                                        levelId: app.continueLevelId,
-                                      ),
-                                    )
+                                        BattleScreen(
+                                          levelId: app.continueLevelId,
+                                        ),
+                                      )
                                   : null,
                             ),
                             const SizedBox(height: 10),

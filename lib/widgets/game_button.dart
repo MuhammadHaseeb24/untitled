@@ -29,10 +29,10 @@ class GameButton extends StatelessWidget {
     final colors = !enabled
         ? const [Color(0xFF3A3D50), Color(0xFF2C2F40)]
         : danger
-        ? const [Color(0xFFE5483D), Color(0xFF9B1F18)]
-        : primary
-        ? const [AppColors.ember, AppColors.emberDeep]
-        : const [AppColors.panelLight, AppColors.panel];
+            ? const [Color(0xFFE5483D), Color(0xFF9B1F18)]
+            : primary
+                ? const [AppColors.ember, AppColors.emberDeep]
+                : const [AppColors.panelLight, AppColors.panel];
     final bottomColor = colors.last;
     return SizedBox(
       width: width,

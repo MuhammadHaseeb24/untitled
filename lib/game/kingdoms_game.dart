@@ -190,6 +190,10 @@ class KingdomsGame extends FlameGame {
         _spawnUnit(Team.player, miner, silent: true);
       }
     }
+    for (final id in level.startingArmy) {
+      final m = data.units[id];
+      if (m != null) _spawnUnit(Team.player, m, silent: true);
+    }
     _initTutorial();
     _syncHud();
   }
@@ -343,9 +347,8 @@ class KingdomsGame extends FlameGame {
   }
 
   void _spawnUnit(Team team, UnitModel model, {bool silent = false}) {
-    final count = team == Team.player
-        ? _spawnCountPlayer++
-        : _spawnCountEnemy++;
+    final count =
+        team == Team.player ? _spawnCountPlayer++ : _spawnCountEnemy++;
     final lane = count % GameConfig.laneOffsets.length;
     final fortress = fortressOf(team);
     final unit = UnitComponent(
@@ -695,8 +698,11 @@ class KingdomsGame extends FlameGame {
   void _checkOutcome() {
     final p = playerFortress.isAlive;
     final e = enemyFortress.isAlive;
-    if (p && e) return;
-    final outcome = ResultCalculator.outcomeFor(playerAlive: p, enemyAlive: e);
+    final survived = level.isSurvival && elapsed >= level.surviveSeconds && p;
+    if (p && e && !survived) return;
+    final outcome = (survived && e)
+        ? BattleOutcome.victory
+        : ResultCalculator.outcomeFor(playerAlive: p, enemyAlive: e);
     _outcome = outcome;
     _phase = _Phase.ending;
     _endTimer = GameConfig.endDelaySeconds;
@@ -748,6 +754,7 @@ class KingdomsGame extends FlameGame {
     hud.speed = _speed;
     hud.paused = _paused;
     hud.elapsed = elapsed;
+    hud.surviveTotal = level.surviveSeconds;
     hud.rallyRemaining = _rallyRemaining;
     hud.wardRemaining = playerFortress.shieldTime;
     for (final e in cooldowns.entries) {

@@ -94,9 +94,8 @@ class UnitPainter {
       c.saveLayer(const Rect.fromLTWH(-90, -170, 180, 190), lp);
     }
 
-    final bob = v.moving
-        ? sin(v.walk * 2).abs() * 2.0
-        : sin(v.time * 2.5) * 0.8;
+    final bob =
+        v.moving ? sin(v.walk * 2).abs() * 2.0 : sin(v.time * 2.5) * 0.8;
     final thick = v.unitId == 'ember_titan' ? 7.0 : 4.6;
     if (v.unitId != 'flame_adept') _legs(c, v, body, thick);
     c.save();
@@ -361,9 +360,8 @@ class UnitPainter {
       const Offset(12, -66),
       _stroke(accent, 2.6),
     );
-    final lift = v.attackT >= 0
-        ? (v.attackT < 0.55 ? v.attackT / 0.55 : 0.0)
-        : 0.0;
+    final lift =
+        v.attackT >= 0 ? (v.attackT < 0.55 ? v.attackT / 0.55 : 0.0) : 0.0;
     c.drawLine(
       Offset(14, -4 - lift * 6),
       Offset(14, -80 - lift * 6),

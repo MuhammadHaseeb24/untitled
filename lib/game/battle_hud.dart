@@ -24,6 +24,9 @@ class BattleHud extends ChangeNotifier {
   bool battleOver = false;
   double elapsed = 0;
 
+  /// > 0 on survival levels: total seconds to survive.
+  double surviveTotal = 0;
+
   /// Ability id -> remaining cooldown fraction (0 = ready).
   final Map<String, double> abilityCooldown = {};
   final Map<String, double> abilityRemainingSeconds = {};

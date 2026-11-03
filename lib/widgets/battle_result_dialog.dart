@@ -33,33 +33,32 @@ class BattleResultDialog extends StatelessWidget {
     final victory = result.outcome == BattleOutcome.victory;
     final draw = result.outcome == BattleOutcome.draw;
     final title = victory ? 'VICTORY!' : (draw ? 'DRAW' : 'DEFEAT');
-    final color = victory
-        ? AppColors.gold
-        : (draw ? AppColors.textDim : AppColors.bad);
+    final color =
+        victory ? AppColors.gold : (draw ? AppColors.textDim : AppColors.bad);
     final hpOk = result.playerFortressFraction >= level.starFortressThreshold;
     final timeOk = result.timeSeconds <= level.parTimeSeconds;
 
     Widget criterion(bool done, String text) => Padding(
-      padding: const EdgeInsets.symmetric(vertical: 2),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            done ? Icons.star_rounded : Icons.star_border_rounded,
-            size: 18,
-            color: done ? AppColors.gold : Colors.white38,
+          padding: const EdgeInsets.symmetric(vertical: 2),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                done ? Icons.star_rounded : Icons.star_border_rounded,
+                size: 18,
+                color: done ? AppColors.gold : Colors.white38,
+              ),
+              const SizedBox(width: 6),
+              Text(
+                text,
+                style: TextStyle(
+                  fontSize: 13,
+                  color: done ? AppColors.text : AppColors.textDim,
+                ),
+              ),
+            ],
           ),
-          const SizedBox(width: 6),
-          Text(
-            text,
-            style: TextStyle(
-              fontSize: 13,
-              color: done ? AppColors.text : AppColors.textDim,
-            ),
-          ),
-        ],
-      ),
-    );
+        );
 
     return ColoredBox(
       color: Colors.black.withAlpha(190),
@@ -122,15 +121,27 @@ class BattleResultDialog extends StatelessWidget {
                 ),
                 if (victory) ...[
                   const SizedBox(height: 10),
-                  criterion(true, 'Win the battle'),
+                  criterion(
+                    true,
+                    level.isSurvival
+                        ? 'Survive ${ResultCalculator.formatTime(level.surviveSeconds)} (or destroy the enemy statue)'
+                        : 'Win the battle',
+                  ),
                   criterion(
                     hpOk,
                     'Keep your statue above ${(level.starFortressThreshold * 100).round()}%',
                   ),
-                  criterion(
-                    timeOk,
-                    'Finish within ${ResultCalculator.formatTime(level.parTimeSeconds)}',
-                  ),
+                  if (level.isSurvival)
+                    criterion(
+                      result.playerFortressFraction >=
+                          ResultCalculator.survivalTopHealth,
+                      'Keep your statue above ${(ResultCalculator.survivalTopHealth * 100).round()}%',
+                    )
+                  else
+                    criterion(
+                      timeOk,
+                      'Finish within ${ResultCalculator.formatTime(level.parTimeSeconds)}',
+                    ),
                   const SizedBox(height: 8),
                   if (reward != null)
                     Row(
@@ -188,11 +199,11 @@ class BattleResultDialog extends StatelessWidget {
   }
 
   Widget _stat(IconData icon, String text) => Row(
-    mainAxisSize: MainAxisSize.min,
-    children: [
-      Icon(icon, size: 18, color: AppColors.textDim),
-      const SizedBox(width: 5),
-      Text(text, style: const TextStyle(fontWeight: FontWeight.w700)),
-    ],
-  );
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 18, color: AppColors.textDim),
+          const SizedBox(width: 5),
+          Text(text, style: const TextStyle(fontWeight: FontWeight.w700)),
+        ],
+      );
 }

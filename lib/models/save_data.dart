@@ -26,23 +26,24 @@ class GameSettings {
     bool? musicOn,
     bool? sfxOn,
     bool? lowQuality,
-  }) => GameSettings(
-    masterVolume: masterVolume ?? this.masterVolume,
-    musicVolume: musicVolume ?? this.musicVolume,
-    sfxVolume: sfxVolume ?? this.sfxVolume,
-    musicOn: musicOn ?? this.musicOn,
-    sfxOn: sfxOn ?? this.sfxOn,
-    lowQuality: lowQuality ?? this.lowQuality,
-  );
+  }) =>
+      GameSettings(
+        masterVolume: masterVolume ?? this.masterVolume,
+        musicVolume: musicVolume ?? this.musicVolume,
+        sfxVolume: sfxVolume ?? this.sfxVolume,
+        musicOn: musicOn ?? this.musicOn,
+        sfxOn: sfxOn ?? this.sfxOn,
+        lowQuality: lowQuality ?? this.lowQuality,
+      );
 
   Map<String, dynamic> toJson() => {
-    'masterVolume': masterVolume,
-    'musicVolume': musicVolume,
-    'sfxVolume': sfxVolume,
-    'musicOn': musicOn,
-    'sfxOn': sfxOn,
-    'lowQuality': lowQuality,
-  };
+        'masterVolume': masterVolume,
+        'musicVolume': musicVolume,
+        'sfxVolume': sfxVolume,
+        'musicOn': musicOn,
+        'sfxOn': sfxOn,
+        'lowQuality': lowQuality,
+      };
 
   static double _vol(Object? v, double def) =>
       v is num && v.isFinite ? clampDouble(v.toDouble(), 0, 1) : def;
@@ -102,16 +103,16 @@ class SaveData {
       );
 
   Map<String, dynamic> toJson() => {
-    'version': currentVersion,
-    'highestUnlocked': highestUnlocked,
-    'completed': {
-      for (final e in completed.entries) '${e.key}': e.value.toJson(),
-    },
-    'coins': coins,
-    'upgrades': upgrades,
-    'tutorialsDone': tutorialsDone.toList(),
-    'settings': settings.toJson(),
-  };
+        'version': currentVersion,
+        'highestUnlocked': highestUnlocked,
+        'completed': {
+          for (final e in completed.entries) '${e.key}': e.value.toJson(),
+        },
+        'coins': coins,
+        'upgrades': upgrades,
+        'tutorialsDone': tutorialsDone.toList(),
+        'settings': settings.toJson(),
+      };
 
   String encode() => jsonEncode(toJson());
 
@@ -133,8 +134,7 @@ class SaveData {
           if (id == null ||
               id < 1 ||
               id > levelCount ||
-              v is! Map<String, dynamic>)
-            continue;
+              v is! Map<String, dynamic>) continue;
           final stars = v['stars'] is num
               ? clampInt((v['stars'] as num).toInt(), 1, 3)
               : 1;
@@ -171,9 +171,8 @@ class SaveData {
       }
       highest = clampInt(highest, 1, levelCount);
 
-      final coins = decoded['coins'] is num
-          ? (decoded['coins'] as num).toInt()
-          : 0;
+      final coins =
+          decoded['coins'] is num ? (decoded['coins'] as num).toInt() : 0;
 
       return SaveData(
         highestUnlocked: highest,

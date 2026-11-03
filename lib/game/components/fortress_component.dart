@@ -13,16 +13,16 @@ class FortressComponent extends PositionComponent implements Damageable {
     required this.game,
     required this.team,
     required this.maxHealth,
-  }) : health = maxHealth,
-       super(
-         position: Vector2(
-           team == Team.player
-               ? GameConfig.playerFortressX
-               : GameConfig.enemyFortressX,
-           GameConfig.groundY,
-         ),
-         priority: 50,
-       );
+  })  : health = maxHealth,
+        super(
+          position: Vector2(
+            team == Team.player
+                ? GameConfig.playerFortressX
+                : GameConfig.enemyFortressX,
+            GameConfig.groundY,
+          ),
+          priority: 50,
+        );
 
   final KingdomsGame game;
   @override
@@ -252,9 +252,8 @@ class FortressComponent extends PositionComponent implements Damageable {
   @override
   void render(Canvas canvas) {
     final friendly = team == Team.player;
-    final stage = fraction > 0.66
-        ? 0
-        : (fraction > 0.33 ? 1 : (fraction > 0 ? 2 : 3));
+    final stage =
+        fraction > 0.66 ? 0 : (fraction > 0.33 ? 1 : (fraction > 0 ? 2 : 3));
 
     canvas.save();
     if (!friendly) canvas.scale(-1, 1);
@@ -299,10 +298,10 @@ class FortressComponent extends PositionComponent implements Damageable {
     );
     final fc = friendly
         ? (fraction > 0.5
-              ? const Color(0xFF58D26B)
-              : (fraction > 0.25
-                    ? const Color(0xFFF2B33D)
-                    : const Color(0xFFE5483D)))
+            ? const Color(0xFF58D26B)
+            : (fraction > 0.25
+                ? const Color(0xFFF2B33D)
+                : const Color(0xFFE5483D)))
         : const Color(0xFFE5231B);
     canvas.drawRect(Rect.fromLTWH(-w / 2, top, w * fraction, 9), _fill(fc));
   }

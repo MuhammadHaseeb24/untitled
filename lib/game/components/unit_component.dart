@@ -28,12 +28,12 @@ class UnitComponent extends PositionComponent implements Damageable {
     required double healthMultiplier,
     required this.damageMultiplier,
     required Vector2 spawnPosition,
-  }) : _lane = lane,
-       maxHealth = model.health * healthMultiplier,
-       health = model.health * healthMultiplier,
-       laneY = GameConfig.laneOffsets[lane],
-       facing = team.direction,
-       super(position: spawnPosition, priority: 100 + lane * 10);
+  })  : _lane = lane,
+        maxHealth = model.health * healthMultiplier,
+        health = model.health * healthMultiplier,
+        laneY = GameConfig.laneOffsets[lane],
+        facing = team.direction,
+        super(position: spawnPosition, priority: 100 + lane * 10);
 
   final KingdomsGame game;
   final UnitModel model;
@@ -314,8 +314,7 @@ class UnitComponent extends PositionComponent implements Damageable {
     final current = target;
     final currentValid = current != null && _isTargetValid(current);
     if (!currentValid || _retargetTimer <= 0) {
-      final keep =
-          current != null &&
+      final keep = current != null &&
           currentValid &&
           current.gapFrom(x) <= model.attackRange;
       if (!keep) target = _pickTarget();
@@ -543,9 +542,8 @@ class UnitComponent extends PositionComponent implements Damageable {
     final rect = Rect.fromLTWH(-w / 2, top, w, 5);
     canvas.drawRect(rect.inflate(1), _barBack);
     final frac = (health / maxHealth).clamp(0.0, 1.0).toDouble();
-    _barFill.color = team == Team.player
-        ? const Color(0xFF58D26B)
-        : const Color(0xFFE5483D);
+    _barFill.color =
+        team == Team.player ? const Color(0xFF58D26B) : const Color(0xFFE5483D);
     canvas.drawRect(
       Rect.fromLTWH(rect.left, rect.top, w * frac, rect.height),
       _barFill,

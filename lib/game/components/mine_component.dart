@@ -8,8 +8,8 @@ import '../game_config.dart';
 /// A pile of gold ore. Miners dig from it until it is empty.
 class MineComponent extends PositionComponent {
   MineComponent({required double x, required this.totalGold})
-    : gold = totalGold,
-      super(position: Vector2(x, GameConfig.groundY + 44), priority: 60);
+      : gold = totalGold,
+        super(position: Vector2(x, GameConfig.groundY + 44), priority: 60);
 
   final int totalGold;
   int gold;
