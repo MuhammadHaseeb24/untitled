@@ -19,14 +19,14 @@ Map<String, dynamic> _json(String file) =>
         as Map<String, dynamic>;
 
 Map<String, UnitModel> _units() => {
-      for (final u in (_json('units.json')['units'] as List))
-        (u as Map<String, dynamic>)['id'] as String: UnitModel.fromJson(u),
-    };
+  for (final u in (_json('units.json')['units'] as List))
+    (u as Map<String, dynamic>)['id'] as String: UnitModel.fromJson(u),
+};
 
 List<LevelModel> _levels() => [
-      for (final l in (_json('levels.json')['levels'] as List))
-        LevelModel.fromJson(l as Map<String, dynamic>),
-    ];
+  for (final l in (_json('levels.json')['levels'] as List))
+    LevelModel.fromJson(l as Map<String, dynamic>),
+];
 
 void main() {
   group('Economy', () {
@@ -404,8 +404,11 @@ void main() {
           l.enemyFortressHealth,
           l.enemy.firstAttackAfterSeconds,
         ].join('|');
-        expect(signatures.add(sig), isTrue,
-            reason: 'duplicate level shape at ${l.id}');
+        expect(
+          signatures.add(sig),
+          isTrue,
+          reason: 'duplicate level shape at ${l.id}',
+        );
       }
     });
 
@@ -444,10 +447,29 @@ void main() {
       for (final l in _levels().where((l) => l.tag == 'Limited Arsenal')) {
         expect(l.unlockedUnits.first, 'miner');
         expect(
-            l.unlockedUnits.contains('ember_squire') ||
-                l.unlockedUnits.contains('iron_guard'),
-            isTrue);
+          l.unlockedUnits.contains('ember_squire') ||
+              l.unlockedUnits.contains('iron_guard'),
+          isTrue,
+        );
         expect(l.unlockedUnits.length, 4);
+      }
+    });
+  });
+
+  group('Enemy spear volley', () {
+    test('enemy uses the volley from level 4 on, with sane numbers', () {
+      for (final l in _levels()) {
+        if (l.id >= 4) {
+          expect(l.enemy.volleyCooldown > 0, isTrue, reason: 'level ${l.id}');
+          expect(l.enemy.volleyCount >= 4 && l.enemy.volleyCount <= 16, isTrue);
+          expect(
+            l.enemy.volleyDamage > 0 && l.enemy.volleyDamage <= 60,
+            isTrue,
+          );
+          expect(l.enemy.volleyFirstAt >= 40, isTrue, reason: 'level ${l.id}');
+        } else {
+          expect(l.enemy.volleyCooldown, 0, reason: 'level ${l.id}');
+        }
       }
     });
   });

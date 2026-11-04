@@ -20,22 +20,23 @@ class AppTheme {
   AppTheme._();
 
   static ThemeData dark() {
-    final scheme = ColorScheme.fromSeed(
-      seedColor: AppColors.ember,
-      brightness: Brightness.dark,
-    ).copyWith(
-      surface: AppColors.panel,
-      primary: AppColors.ember,
-      secondary: AppColors.gold,
-    );
+    final scheme =
+        ColorScheme.fromSeed(
+          seedColor: AppColors.ember,
+          brightness: Brightness.dark,
+        ).copyWith(
+          surface: AppColors.panel,
+          primary: AppColors.ember,
+          secondary: AppColors.gold,
+        );
     return ThemeData(
       useMaterial3: true,
       colorScheme: scheme,
       scaffoldBackgroundColor: AppColors.night,
       textTheme: ThemeData.dark().textTheme.apply(
-            bodyColor: AppColors.text,
-            displayColor: AppColors.text,
-          ),
+        bodyColor: AppColors.text,
+        displayColor: AppColors.text,
+      ),
       sliderTheme: const SliderThemeData(
         activeTrackColor: AppColors.ember,
         thumbColor: AppColors.gold,

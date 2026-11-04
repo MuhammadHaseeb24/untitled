@@ -193,6 +193,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.12.2"
+  flame_lint:
+    dependency: "direct dev"
+    description:
+      name: flame_lint
+      sha256: af712430a39402b4698aacb884cc378449d6851784bcb5155e1f055a215c8af9
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.2.3"
   flutter:
     dependency: "direct main"
     description: flutter

@@ -63,8 +63,9 @@ class _HpBar extends StatelessWidget {
     return Semantics(
       label: '$label ${(fraction * 100).round()} percent',
       child: Column(
-        crossAxisAlignment:
-            alignRight ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+        crossAxisAlignment: alignRight
+            ? CrossAxisAlignment.end
+            : CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(

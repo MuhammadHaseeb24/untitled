@@ -11,12 +11,13 @@ import 'effect_component.dart';
 
 enum _SpearPhase { waiting, flying, stuck }
 
-/// One spear of a Spear Volley. It waits for its [delay], flies along a high
+/// One spear of a Spear Volley (thrown by either team). It waits for its [delay], flies along a high
 /// arc from the statue's spear rack, then lands and damages enemies in a small
 /// area. Time comes from the game's simulation clock, so pause works.
 class SpearComponent extends PositionComponent {
   SpearComponent({
     required this.game,
+    required this.team,
     required this.startX,
     required this.targetX,
     required this.landLane,
@@ -32,6 +33,9 @@ class SpearComponent extends PositionComponent {
   }
 
   final KingdomsGame game;
+
+  /// The team that throws the spears; they hurt the opposing team.
+  final Team team;
   final double startX;
   final double targetX;
 
@@ -105,7 +109,7 @@ class SpearComponent extends PositionComponent {
         cx: targetX,
         cy: GameConfig.groundY + landLane,
         radius: radius,
-        victimTeam: Team.enemy,
+        victimTeam: team.opponent,
         raw: damage,
       );
       game.audio.playSfx(Sfx.arrowHit);

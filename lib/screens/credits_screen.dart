@@ -9,16 +9,16 @@ class CreditsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Widget h(String t) => Padding(
-          padding: const EdgeInsets.only(top: 16, bottom: 4),
-          child: Text(
-            t,
-            style: const TextStyle(
-              fontWeight: FontWeight.w900,
-              letterSpacing: 2,
-              color: AppColors.gold,
-            ),
-          ),
-        );
+      padding: const EdgeInsets.only(top: 16, bottom: 4),
+      child: Text(
+        t,
+        style: const TextStyle(
+          fontWeight: FontWeight.w900,
+          letterSpacing: 2,
+          color: AppColors.gold,
+        ),
+      ),
+    );
     const body = TextStyle(color: AppColors.text, height: 1.4);
     return GameScaffold(
       title: 'CREDITS',
@@ -28,7 +28,7 @@ class CreditsScreen extends StatelessWidget {
           child: ListView(
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
             children: [
-              h('KINGDOMS OF EMBER'),
+              h('EMBER LEGION'),
               const Text(
                 'An original fantasy lane-strategy game.',
                 style: body,

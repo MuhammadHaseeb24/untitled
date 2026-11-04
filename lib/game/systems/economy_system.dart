@@ -9,8 +9,8 @@ class EconomySystem {
     required int startingGold,
     required this.passiveIncome,
     required double intervalSeconds,
-  })  : gold = max(0, startingGold),
-        interval = max(0.1, intervalSeconds);
+  }) : gold = max(0, startingGold),
+       interval = max(0.1, intervalSeconds);
 
   int gold;
   final int passiveIncome;

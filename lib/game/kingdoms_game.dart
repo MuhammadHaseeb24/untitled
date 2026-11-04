@@ -94,6 +94,9 @@ class KingdomsGame extends FlameGame {
   final List<UnitComponent> playerUnits = [];
   final List<UnitComponent> enemyUnits = [];
   final Map<String, Cooldown> cooldowns = {};
+  late final Cooldown enemyVolleyCd = Cooldown(
+    level.enemy.volleyCooldown > 0 ? level.enemy.volleyCooldown : 1,
+  );
 
   Command playerCommand = Command.defend;
   _Phase _phase = _Phase.running;
@@ -170,6 +173,13 @@ class KingdomsGame extends FlameGame {
       if (model != null) cooldowns[id] = Cooldown(model.cooldown);
     }
     add(BattlefieldBackground(theme: level.theme, lowQuality: lowQuality));
+    playerFortress.hasSpearRack = level.availableAbilities.contains(
+      'spear_volley',
+    );
+    enemyFortress.hasSpearRack = level.enemy.volleyCooldown > 0;
+    if (level.enemy.volleyCooldown > 0) {
+      enemyVolleyCd.remaining = level.enemy.volleyFirstAt;
+    }
     add(playerFortress);
     add(enemyFortress);
     for (final spec in level.mines) {
@@ -262,6 +272,7 @@ class KingdomsGame extends FlameGame {
       for (final c in cooldowns.values) {
         c.tick(dt);
       }
+      if (level.enemy.volleyCooldown > 0) enemyVolleyCd.tick(dt);
       if (_rallyRemaining > 0) _rallyRemaining = max(0.0, _rallyRemaining - dt);
       _runEnemyAi(dt);
       _checkOutcome();
@@ -300,6 +311,41 @@ class KingdomsGame extends FlameGame {
     for (final m in out.free) {
       _spawnUnit(Team.enemy, m);
     }
+    _enemyVolley();
+  }
+
+  /// The enemy's own Spear Volley (neza-bazi). It only fires at a real cluster
+  /// of your visible units, so garrisoning inside the statue avoids it.
+  void _enemyVolley() {
+    final cfg = level.enemy;
+    if (cfg.volleyCooldown <= 0 || !enemyVolleyCd.ready) return;
+    const spread = 220.0;
+    final cluster = _bestClusterOf(Team.player, spread * 0.5);
+    if (cluster == null || cluster.count < 2) return;
+    final minX = playerFortress.frontX + 30;
+    final maxX = enemyFortress.frontX - 40;
+    for (var i = 0; i < cfg.volleyCount; i++) {
+      final tx = (cluster.x + (rng.nextDouble() * 2 - 1) * spread / 2)
+          .clamp(minX, maxX)
+          .toDouble();
+      final lane =
+          GameConfig.laneOffsets[rng.nextInt(GameConfig.laneOffsets.length)];
+      add(
+        SpearComponent(
+          game: this,
+          team: Team.enemy,
+          startX: enemyFortress.x + 60,
+          targetX: tx,
+          landLane: lane,
+          damage: cfg.volleyDamage * cfg.damageMultiplier,
+          radius: 46,
+          delay: i * 0.08,
+          playSound: i == 0,
+        ),
+      );
+    }
+    enemyVolleyCd.start();
+    showToast('Enemy spears incoming! Garrison to hide');
   }
 
   // --- Units ----------------------------------------------------------------
@@ -333,6 +379,22 @@ class KingdomsGame extends FlameGame {
     return best ?? busy;
   }
 
+  /// Called on the moment a miner's pickaxe strikes: sparks, sound, wobble.
+  void onPickaxeHit(UnitComponent miner, MineComponent mine) {
+    mine.pulse();
+    audio.playSfx(Sfx.mine);
+    addEffect(
+      EffectComponent.burst(
+        at: Vector2(mine.x - miner.facing * 8, mine.y - 26),
+        color: const Color(0xFFFFD84D),
+        count: lowQuality ? 2 : 6,
+        rng: rng,
+        speed: 130,
+        duration: 0.35,
+      ),
+    );
+  }
+
   void depositGold(UnitComponent miner, int amount) {
     if (amount <= 0 || !combatActive) return;
     economy.add(amount);
@@ -347,8 +409,9 @@ class KingdomsGame extends FlameGame {
   }
 
   void _spawnUnit(Team team, UnitModel model, {bool silent = false}) {
-    final count =
-        team == Team.player ? _spawnCountPlayer++ : _spawnCountEnemy++;
+    final count = team == Team.player
+        ? _spawnCountPlayer++
+        : _spawnCountEnemy++;
     final lane = count % GameConfig.laneOffsets.length;
     final fortress = fortressOf(team);
     final unit = UnitComponent(
@@ -576,6 +639,7 @@ class KingdomsGame extends FlameGame {
           add(
             SpearComponent(
               game: this,
+              team: Team.player,
               startX: playerFortress.x - 60,
               targetX: tx,
               landLane: lane,
@@ -600,24 +664,31 @@ class KingdomsGame extends FlameGame {
   }
 
   /// World x of the largest cluster of living enemies, or null if none.
-  double? _bestEnemyCluster(double radius) {
+  double? _bestEnemyCluster(double radius) =>
+      _bestClusterOf(Team.enemy, radius)?.x;
+
+  /// Largest cluster of visible units of [victim]: its world x and unit count.
+  ({double x, int count})? _bestClusterOf(Team victim, double radius) {
+    final units = unitsOf(victim);
+    final base = victim == Team.enemy ? playerFortress : enemyFortress;
     double? bestX;
     var bestCount = 0;
     var bestDist = double.infinity;
-    for (final c in enemyUnits) {
+    for (final c in units) {
       if (!c.targetable) continue;
       var count = 0;
-      for (final o in enemyUnits) {
+      for (final o in units) {
         if (o.targetable && (o.x - c.x).abs() <= radius * 0.8) count++;
       }
-      final dist = (c.x - playerFortress.frontX).abs();
+      final dist = (c.x - base.frontX).abs();
       if (count > bestCount || (count == bestCount && dist < bestDist)) {
         bestCount = count;
         bestX = c.x;
         bestDist = dist;
       }
     }
-    return bestX;
+    if (bestX == null) return null;
+    return (x: bestX, count: bestCount);
   }
 
   void pauseBattle() {

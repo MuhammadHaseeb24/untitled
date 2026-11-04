@@ -5,7 +5,7 @@ import '../services/app_state.dart';
 /// Gives every screen access to [AppState] without extra packages.
 class AppScope extends InheritedNotifier<AppState> {
   const AppScope({super.key, required AppState state, required super.child})
-      : super(notifier: state);
+    : super(notifier: state);
 
   /// Use in build methods: rebuilds when app state changes.
   static AppState of(BuildContext context) {

@@ -303,7 +303,11 @@
        "iron_guard"
       ]
      }
-    ]
+    ],
+    "volleyCooldownSeconds": 44,
+    "volleyFirstAtSeconds": 106,
+    "volleyCount": 7,
+    "volleyDamage": 22
    },
    "tutorial": [],
    "startingMiners": 2,
@@ -373,7 +377,11 @@
        "ash_archer"
       ]
      }
-    ]
+    ],
+    "volleyCooldownSeconds": 41,
+    "volleyFirstAtSeconds": 100,
+    "volleyCount": 7,
+    "volleyDamage": 23
    },
    "tutorial": [
     {
@@ -457,7 +465,11 @@
        "ash_archer"
       ]
      }
-    ]
+    ],
+    "volleyCooldownSeconds": 38,
+    "volleyFirstAtSeconds": 94,
+    "volleyCount": 8,
+    "volleyDamage": 24
    },
    "tutorial": [],
    "startingMiners": 3,
@@ -550,7 +562,11 @@
        "ash_archer"
       ]
      }
-    ]
+    ],
+    "volleyCooldownSeconds": 35,
+    "volleyFirstAtSeconds": 88,
+    "volleyCount": 8,
+    "volleyDamage": 25
    },
    "tutorial": [],
    "startingMiners": 3,
@@ -629,7 +645,11 @@
        "flame_adept"
       ]
      }
-    ]
+    ],
+    "volleyCooldownSeconds": 34,
+    "volleyFirstAtSeconds": 82,
+    "volleyCount": 9,
+    "volleyDamage": 26
    },
    "tutorial": [],
    "startingMiners": 3,
@@ -733,7 +753,11 @@
        "ember_titan"
       ]
      }
-    ]
+    ],
+    "volleyCooldownSeconds": 34,
+    "volleyFirstAtSeconds": 76,
+    "volleyCount": 9,
+    "volleyDamage": 27
    },
    "tutorial": [],
    "startingMiners": 3,
@@ -837,7 +861,11 @@
        "flame_adept"
       ]
      }
-    ]
+    ],
+    "volleyCooldownSeconds": 34,
+    "volleyFirstAtSeconds": 70,
+    "volleyCount": 10,
+    "volleyDamage": 28
    },
    "tutorial": [],
    "startingMiners": 3,

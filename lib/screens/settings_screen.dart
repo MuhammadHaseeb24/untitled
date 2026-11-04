@@ -49,27 +49,24 @@ class SettingsScreen extends StatelessWidget {
       double value,
       bool enabled,
       ValueChanged<double> onChanged,
-    ) =>
-        Row(
-          children: [
-            SizedBox(
-              width: 130,
-              child: Text(
-                label,
-                style: const TextStyle(fontWeight: FontWeight.w700),
-              ),
-            ),
-            Expanded(
-              child:
-                  Slider(value: value, onChanged: enabled ? onChanged : null),
-            ),
-            SizedBox(
-              width: 44,
-              child:
-                  Text('${(value * 100).round()}%', textAlign: TextAlign.end),
-            ),
-          ],
-        );
+    ) => Row(
+      children: [
+        SizedBox(
+          width: 130,
+          child: Text(
+            label,
+            style: const TextStyle(fontWeight: FontWeight.w700),
+          ),
+        ),
+        Expanded(
+          child: Slider(value: value, onChanged: enabled ? onChanged : null),
+        ),
+        SizedBox(
+          width: 44,
+          child: Text('${(value * 100).round()}%', textAlign: TextAlign.end),
+        ),
+      ],
+    );
 
     return GameScaffold(
       title: 'SETTINGS',

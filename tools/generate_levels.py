@@ -256,6 +256,10 @@ for n in range(len(intro) + 1, TOTAL + 1):
         "healthMultiplier": hmult,
         "damageMultiplier": dmult,
         "waves": waves,
+        "volleyCooldownSeconds": int(max(18, (46 - n / 9) * (0.7 if key in ("Archer Nest", "Early Rush") else 1.0))),
+        "volleyFirstAtSeconds": int(max(50, 110 - n / 3)),
+        "volleyCount": int(min(16, 6 + n // 26 + (3 if key == "Archer Nest" else 0))),
+        "volleyDamage": int(min(48, 20 + n / 11)),
     }
 
     # --- statues, par, reward ---------------------------------------------------

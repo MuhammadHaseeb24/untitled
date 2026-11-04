@@ -18,6 +18,7 @@ enum Sfx {
   victory('sfx/victory.wav'),
   defeat('sfx/defeat.wav'),
   ability('sfx/ability.wav'),
+  mine('sfx/mine.wav'),
   error('sfx/error.wav');
 
   const Sfx(this.file);

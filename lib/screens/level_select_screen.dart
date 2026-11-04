@@ -298,10 +298,10 @@ class _LevelCard extends StatelessWidget {
             width: double.infinity,
             onPressed: unlocked
                 ? () => Navigator.of(context).push(
-                      MaterialPageRoute<void>(
-                        builder: (_) => BattleScreen(levelId: level.id),
-                      ),
-                    )
+                    MaterialPageRoute<void>(
+                      builder: (_) => BattleScreen(levelId: level.id),
+                    ),
+                  )
                 : null,
           ),
         ],

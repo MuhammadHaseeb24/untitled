@@ -18,8 +18,8 @@ class _Star {
 /// and lightning.
 class BattlefieldBackground extends Component {
   BattlefieldBackground({required int theme, required this.lowQuality})
-      : mode = theme.abs() % 6,
-        super(priority: 0) {
+    : mode = theme.abs() % 6,
+      super(priority: 0) {
     final r = Random(theme * 13 + 7);
     final starCount = lowQuality ? 35 : 90;
     for (var i = 0; i < starCount; i++) {
@@ -500,8 +500,9 @@ extension _MoreThemes on BattlefieldBackground {
     canvas.drawPath(_farHill, _p..color = const Color(0xFF281645));
     // two layers of dark pines
     for (var layer = 0; layer < 2; layer++) {
-      final col =
-          layer == 0 ? const Color(0xFF1F1038) : const Color(0xFF2B1750);
+      final col = layer == 0
+          ? const Color(0xFF1F1038)
+          : const Color(0xFF2B1750);
       for (final t in _pines) {
         final bx = t.dx + layer * 22;
         final by = BattlefieldBackground._horizon + 42 + layer * 8;
@@ -521,7 +522,8 @@ extension _MoreThemes on BattlefieldBackground {
     // fireflies
     for (final st in _stars) {
       final fx = st.x + 20 * sin(_t * 0.6 + st.phase);
-      final fy = BattlefieldBackground._horizon +
+      final fy =
+          BattlefieldBackground._horizon +
           60 +
           (st.y % 230) +
           12 * cos(_t * 0.7 + st.phase);
@@ -615,7 +617,7 @@ extension _MoreThemes on BattlefieldBackground {
 /// (night theme only).
 class ForegroundLayer extends Component {
   ForegroundLayer({required this.lowQuality, required int seed, this.theme = 0})
-      : super(priority: 900) {
+    : super(priority: 900) {
     final r = Random(seed + 21);
     final n = lowQuality ? 24 : 60;
     for (var i = 0; i < n; i++) {
@@ -626,6 +628,15 @@ class ForegroundLayer extends Component {
   final bool lowQuality;
   final int theme;
   final List<Offset> _tufts = [];
+
+  /// Soft dark edges for a cinematic, deeper look.
+  final Paint _vignette = Paint()
+    ..shader = Gradient.radial(
+      const Offset(800, 340),
+      1050,
+      const [Color(0x00000000), Color(0x00000000), Color(0x88000000)],
+      const [0.0, 0.58, 1.0],
+    );
   final Paint _p = Paint()
     ..style = PaintingStyle.stroke
     ..strokeWidth = 2.6
@@ -634,6 +645,7 @@ class ForegroundLayer extends Component {
 
   @override
   void render(Canvas canvas) {
+    canvas.drawRect(const Rect.fromLTRB(-2000, -1500, 3600, 2200), _vignette);
     final m = theme.abs() % 6;
     if (m != 0 && m != 4) return;
     for (final t in _tufts) {

@@ -33,32 +33,33 @@ class BattleResultDialog extends StatelessWidget {
     final victory = result.outcome == BattleOutcome.victory;
     final draw = result.outcome == BattleOutcome.draw;
     final title = victory ? 'VICTORY!' : (draw ? 'DRAW' : 'DEFEAT');
-    final color =
-        victory ? AppColors.gold : (draw ? AppColors.textDim : AppColors.bad);
+    final color = victory
+        ? AppColors.gold
+        : (draw ? AppColors.textDim : AppColors.bad);
     final hpOk = result.playerFortressFraction >= level.starFortressThreshold;
     final timeOk = result.timeSeconds <= level.parTimeSeconds;
 
     Widget criterion(bool done, String text) => Padding(
-          padding: const EdgeInsets.symmetric(vertical: 2),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                done ? Icons.star_rounded : Icons.star_border_rounded,
-                size: 18,
-                color: done ? AppColors.gold : Colors.white38,
-              ),
-              const SizedBox(width: 6),
-              Text(
-                text,
-                style: TextStyle(
-                  fontSize: 13,
-                  color: done ? AppColors.text : AppColors.textDim,
-                ),
-              ),
-            ],
+      padding: const EdgeInsets.symmetric(vertical: 2),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            done ? Icons.star_rounded : Icons.star_border_rounded,
+            size: 18,
+            color: done ? AppColors.gold : Colors.white38,
           ),
-        );
+          const SizedBox(width: 6),
+          Text(
+            text,
+            style: TextStyle(
+              fontSize: 13,
+              color: done ? AppColors.text : AppColors.textDim,
+            ),
+          ),
+        ],
+      ),
+    );
 
     return ColoredBox(
       color: Colors.black.withAlpha(190),
@@ -199,11 +200,11 @@ class BattleResultDialog extends StatelessWidget {
   }
 
   Widget _stat(IconData icon, String text) => Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 18, color: AppColors.textDim),
-          const SizedBox(width: 5),
-          Text(text, style: const TextStyle(fontWeight: FontWeight.w700)),
-        ],
-      );
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      Icon(icon, size: 18, color: AppColors.textDim),
+      const SizedBox(width: 5),
+      Text(text, style: const TextStyle(fontWeight: FontWeight.w700)),
+    ],
+  );
 }

@@ -27,8 +27,9 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
     });
   }
 
-  void _push(Widget screen) => Navigator.of(context)
-      .push(MaterialPageRoute<void>(builder: (_) => screen));
+  void _push(Widget screen) =>
+      Navigator.of(context)
+          .push(MaterialPageRoute<void>(builder: (_) => screen));
 
   @override
   Widget build(BuildContext context) {
@@ -49,20 +50,18 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          ShaderMask(
-                            shaderCallback: (r) => const LinearGradient(
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                              colors: [AppColors.gold, AppColors.ember],
-                            ).createShader(r),
-                            child: const Icon(
+                          Image.asset(
+                            'assets/icon/logo.png',
+                            width: 130,
+                            height: 130,
+                            errorBuilder: (_, __, ___) => const Icon(
                               Icons.local_fire_department_rounded,
-                              size: 84,
-                              color: Colors.white,
+                              size: 130,
+                              color: AppColors.ember,
                             ),
                           ),
                           const Text(
-                            'KINGDOMS',
+                            'EMBER',
                             style: TextStyle(
                               fontSize: 40,
                               fontWeight: FontWeight.w900,
@@ -71,7 +70,7 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
                             ),
                           ),
                           const Text(
-                            'OF EMBER',
+                            'LEGION',
                             style: TextStyle(
                               fontSize: 28,
                               fontWeight: FontWeight.w900,
@@ -127,10 +126,10 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
                               icon: Icons.fast_forward_rounded,
                               onPressed: hasProgress
                                   ? () => _push(
-                                        BattleScreen(
-                                          levelId: app.continueLevelId,
-                                        ),
-                                      )
+                                      BattleScreen(
+                                        levelId: app.continueLevelId,
+                                      ),
+                                    )
                                   : null,
                             ),
                             const SizedBox(height: 10),

@@ -32,14 +32,13 @@ class EffectComponent extends PositionComponent {
     required Color color,
     required double radius,
     double duration = 0.45,
-  }) =>
-      EffectComponent._(
-        kind: EffectKind.ring,
-        at: at,
-        color: color,
-        duration: duration,
-        radius: radius,
-      );
+  }) => EffectComponent._(
+    kind: EffectKind.ring,
+    at: at,
+    color: color,
+    duration: duration,
+    radius: radius,
+  );
 
   factory EffectComponent.burst({
     required Vector2 at,

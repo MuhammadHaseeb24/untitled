@@ -61,6 +61,7 @@ write(sfx + "fortress_hit.wav", mix(tone(80, 0.35, 0.7, 7, 45), noise(0.3, 0.4, 
 write(sfx + "victory.wav", seq(*[tone(f, 0.2, 0.4, 3) for f in (523, 659, 784)], tone(1047, 0.6, 0.45, 2.5)))
 write(sfx + "defeat.wav", seq(*[tone(f, 0.28, 0.4, 3, shape="saw") for f in (392, 349, 311)], tone(262, 0.7, 0.4, 2.5, shape="saw")))
 write(sfx + "ability.wav", mix(tone(250, 0.5, 0.4, 2.5, 1200, "sine", 12), noise(0.4, 0.2, 6)))
+write(sfx + "mine.wav", mix(tone(1500, 0.07, 0.45, 45, 900, "square"), noise(0.05, 0.35, 45), tone(540, 0.09, 0.3, 30)))
 write(sfx + "error.wav", seq(tone(160, 0.1, 0.45, 8, shape="square"), tone(130, 0.14, 0.45, 8, shape="square")))
 
 

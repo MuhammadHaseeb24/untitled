@@ -15,7 +15,7 @@ class KingdomsApp extends StatelessWidget {
     return AppScope(
       state: appState,
       child: MaterialApp(
-        title: 'Kingdoms of Ember',
+        title: 'Ember Legion',
         debugShowCheckedModeBanner: false,
         theme: AppTheme.dark(),
         home: const SplashScreen(),

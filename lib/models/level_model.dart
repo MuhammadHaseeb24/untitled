@@ -29,6 +29,10 @@ class EnemyConfig {
     required this.healthMultiplier,
     required this.damageMultiplier,
     required this.waves,
+    required this.volleyCooldown,
+    required this.volleyFirstAt,
+    required this.volleyCount,
+    required this.volleyDamage,
   });
 
   final int startingGold;
@@ -43,6 +47,12 @@ class EnemyConfig {
   final double healthMultiplier;
   final double damageMultiplier;
   final List<EnemyWave> waves;
+
+  /// Enemy Spear Volley (neza-bazi). 0 = the enemy never uses it.
+  final double volleyCooldown;
+  final double volleyFirstAt;
+  final int volleyCount;
+  final double volleyDamage;
 
   factory EnemyConfig.fromJson(Map<String, dynamic> j, String ctx) {
     final waves = <EnemyWave>[];
@@ -71,6 +81,10 @@ class EnemyConfig {
       healthMultiplier: optDouble(j, 'healthMultiplier', ctx, 1),
       damageMultiplier: optDouble(j, 'damageMultiplier', ctx, 1),
       waves: waves,
+      volleyCooldown: optDouble(j, 'volleyCooldownSeconds', ctx, 0),
+      volleyFirstAt: optDouble(j, 'volleyFirstAtSeconds', ctx, 90),
+      volleyCount: optInt(j, 'volleyCount', ctx, 8),
+      volleyDamage: optDouble(j, 'volleyDamage', ctx, 25),
     );
     check(cfg.buildOrder.isNotEmpty, ctx, 'buildOrder must not be empty');
     check(

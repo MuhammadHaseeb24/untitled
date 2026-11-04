@@ -1,5 +1,5 @@
 // Run once after `flutter create`:  dart run tools/patch_android.dart
-// Sets the app name and locks the main activity to landscape.
+// Sets the app name (Ember Legion) and locks the main activity to landscape.
 import 'dart:io';
 
 void main() {
@@ -14,7 +14,7 @@ void main() {
 
   xml = xml.replaceFirst(
     RegExp(r'android:label="[^"]*"'),
-    'android:label="Kingdoms of Ember"',
+    'android:label="Ember Legion"',
   );
 
   if (!xml.contains('android:screenOrientation')) {

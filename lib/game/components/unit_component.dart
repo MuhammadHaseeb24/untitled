@@ -28,12 +28,12 @@ class UnitComponent extends PositionComponent implements Damageable {
     required double healthMultiplier,
     required this.damageMultiplier,
     required Vector2 spawnPosition,
-  })  : _lane = lane,
-        maxHealth = model.health * healthMultiplier,
-        health = model.health * healthMultiplier,
-        laneY = GameConfig.laneOffsets[lane],
-        facing = team.direction,
-        super(position: spawnPosition, priority: 100 + lane * 10);
+  }) : _lane = lane,
+       maxHealth = model.health * healthMultiplier,
+       health = model.health * healthMultiplier,
+       laneY = GameConfig.laneOffsets[lane],
+       facing = team.direction,
+       super(position: spawnPosition, priority: 100 + lane * 10);
 
   final KingdomsGame game;
   final UnitModel model;
@@ -264,7 +264,13 @@ class UnitComponent extends PositionComponent implements Damageable {
         break;
       case _MinerPhase.digging:
         state = UnitState.idle;
+        final before = (_digTimer % 0.8) / 0.8;
         _digTimer += dt;
+        final after = (_digTimer % 0.8) / 0.8;
+        final mineHere = _mine;
+        if (mineHere != null && before < 0.55 && after >= 0.55) {
+          game.onPickaxeHit(this, mineHere);
+        }
         if (_digTimer >= GameConfig.digSeconds) {
           final m = _mine;
           if (m != null) {
@@ -314,7 +320,8 @@ class UnitComponent extends PositionComponent implements Damageable {
     final current = target;
     final currentValid = current != null && _isTargetValid(current);
     if (!currentValid || _retargetTimer <= 0) {
-      final keep = current != null &&
+      final keep =
+          current != null &&
           currentValid &&
           current.gapFrom(x) <= model.attackRange;
       if (!keep) target = _pickTarget();
@@ -519,7 +526,7 @@ class UnitComponent extends PositionComponent implements Damageable {
     final v = _visual;
     v.unitId = model.id;
     v.team = team;
-    v.scale = model.scale;
+    v.scale = model.scale * (1 + laneY * 0.0025);
     v.facing = facing;
     v.walk = _walk;
     v.moving = state == UnitState.moving;
@@ -537,13 +544,29 @@ class UnitComponent extends PositionComponent implements Damageable {
     UnitPainter.paint(canvas, v);
 
     if (state == UnitState.dying) return;
+    if (model.kind == UnitKind.miner && _phase == _MinerPhase.digging) {
+      final c = Offset(0, -(112.0 * model.scale));
+      canvas.drawCircle(c, 9, Paint()..color = const Color(0x99000000));
+      canvas.drawArc(
+        Rect.fromCircle(center: c, radius: 7),
+        -pi / 2,
+        2 * pi * (_digTimer / GameConfig.digSeconds).clamp(0.0, 1.0),
+        false,
+        Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 3
+          ..strokeCap = StrokeCap.round
+          ..color = const Color(0xFFFFD84D),
+      );
+    }
     final w = 38.0 * model.scale;
     final top = -(98.0 * model.scale);
     final rect = Rect.fromLTWH(-w / 2, top, w, 5);
     canvas.drawRect(rect.inflate(1), _barBack);
     final frac = (health / maxHealth).clamp(0.0, 1.0).toDouble();
-    _barFill.color =
-        team == Team.player ? const Color(0xFF58D26B) : const Color(0xFFE5483D);
+    _barFill.color = team == Team.player
+        ? const Color(0xFF58D26B)
+        : const Color(0xFFE5483D);
     canvas.drawRect(
       Rect.fromLTWH(rect.left, rect.top, w * frac, rect.height),
       _barFill,

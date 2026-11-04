@@ -60,21 +60,19 @@ class _SplashScreenState extends State<SplashScreen> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  ShaderMask(
-                    shaderCallback: (r) => const LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [AppColors.gold, AppColors.ember],
-                    ).createShader(r),
-                    child: const Icon(
+                  Image.asset(
+                    'assets/icon/logo.png',
+                    width: 150,
+                    height: 150,
+                    errorBuilder: (_, __, ___) => const Icon(
                       Icons.local_fire_department_rounded,
-                      size: 96,
-                      color: Colors.white,
+                      size: 150,
+                      color: AppColors.ember,
                     ),
                   ),
                   const SizedBox(height: 6),
                   const Text(
-                    'KINGDOMS OF EMBER',
+                    'EMBER LEGION',
                     style: TextStyle(
                       fontSize: 34,
                       fontWeight: FontWeight.w900,
@@ -84,7 +82,7 @@ class _SplashScreenState extends State<SplashScreen> {
                   ),
                   const SizedBox(height: 4),
                   const Text(
-                    'Command the flame. Break the crown.',
+                    'Mine. Build. Defend. Conquer.',
                     style: TextStyle(
                       color: AppColors.textDim,
                       letterSpacing: 1,
